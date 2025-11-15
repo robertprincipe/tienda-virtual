@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
-import { useCategories } from "~/ecommerce/categories/queries";
+import { useCategories } from "@/services/categories/queries/category.query";
 
 export const NavigationMenuDropdown = () => {
   const { data } = useCategories();
   return (
     <div className="flex justify-center px-3 gap-3">
-      {data?.result.data.map((category) => (
+      {data?.map((category) => (
         <FlyoutLink
           key={category.id}
-          href={`/${category.handle}`}
+          href={`/${category.slug}`}
           FlyoutContent={PricingContent}
         >
           <span>{category.name}</span>

@@ -10,4 +10,4 @@ export interface PaginatedProducts {
   nextPage: number | null;
 }
 
-export interface ProductDetail extends ProductWithRelations {}
+export type ProductDetail = ProductWithRelations;

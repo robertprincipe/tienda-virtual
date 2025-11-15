@@ -7,10 +7,11 @@ import { Icon } from "@iconify/react";
 import { Cart } from "./cart";
 import { Navigation } from "./navigation";
 import { useScroll, motion, useMotionValueEvent } from "framer-motion";
-import { useCartStore } from "../products/[handle]/cart.store";
-import SearchNavbar from "./search-navbar";
+
+// import SearchNavbar from "./search-navbar";
 import Link from "next/link";
 import { CartIcon } from "./cart-icon";
+import { useCartStore } from "@/hooks/stores/cart.store";
 
 export const SiteHeader = () => {
   const [hidden, setHidden] = React.useState(false);
@@ -51,7 +52,7 @@ export const SiteHeader = () => {
               />
             </button>
           </div>
-          <SearchNavbar />
+          {/* <SearchNavbar /> */}
           <CartIcon />
         </nav>
       </header>

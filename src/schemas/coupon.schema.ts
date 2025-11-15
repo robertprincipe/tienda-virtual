@@ -29,8 +29,7 @@ const requiredNumber = (message: string, options?: { min?: number }) =>
     preprocessNumber,
     z
       .number({
-        invalid_type_error: message,
-        required_error: message,
+        error: message,
       })
       .min(options?.min ?? 0, message)
   );
@@ -41,7 +40,7 @@ const optionalNumber = (message: string, options?: { min?: number }) =>
       preprocessNumber,
       z
         .number({
-          invalid_type_error: message,
+          error: message,
         })
         .min(options?.min ?? 0, message)
     )
@@ -53,7 +52,7 @@ const optionalInteger = (message: string, options?: { min?: number }) =>
       preprocessNumber,
       z
         .number({
-          invalid_type_error: message,
+          error: message,
         })
         .int(message)
         .min(options?.min ?? 0, message)
@@ -79,8 +78,8 @@ const optionalDate = z
       return new Date(trimmed);
     }
 
-  return value;
-}, z.date({ invalid_type_error: "Fecha inválida", required_error: "Fecha inválida" }))
+    return value;
+  }, z.date({ error: "Fecha inválida" }))
   .optional();
 
 const optionalBoolean = z

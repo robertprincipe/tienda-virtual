@@ -1,15 +1,9 @@
-import { SelectProduct } from "@/schemas/product.schema";
+import type { SelectProduct } from "@/schemas/product.schema";
 
 export interface CartItem {
   id: number;
-  cart_id: number;
-  product_id: number;
   quantity: number;
-  unit_price: number;
-  unit_price_formatted: string;
-  subtotal: number;
-  subtotal_formatted: string;
-  product: SelectProduct;
+  product: Pick<SelectProduct, "name" | "price" | "compareAtPrice">;
 }
 
 export interface Cart {

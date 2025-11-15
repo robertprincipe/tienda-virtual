@@ -10,9 +10,29 @@ import {
 } from "@/components/ui/sheet";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
-import { QuantityInputBasic } from "./input-quantity-v1";
+import { QuantityInputBasic } from "./input-quantity";
 import Link from "next/link";
 import { useCartStore } from "@/hooks/stores/cart.store";
+import { CartItem } from "@/types/cart";
+import { parseIntSafety } from "@/lib/utils";
+
+// Datos inventados para placeholder
+const fakeData = {
+  result: {
+    cartItems: [
+      {
+        id: 1,
+        quantity: 2,
+        product: { name: "Otro producto", price: "50", compareAtPrice: "70" },
+      },
+      {
+        id: 2,
+        quantity: 1,
+        product: { name: "Otro producto", price: "80", compareAtPrice: "100" },
+      },
+    ],
+  },
+};
 
 export function Cart() {
   const [open, setOpen, total] = useCartStore((state) => [
@@ -20,7 +40,9 @@ export function Cart() {
     state.setOpen,
     state.total,
   ]);
-  // const { data, isLoading } = useCart(open);
+
+  const data = fakeData;
+  const isLoading = false;
 
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -37,7 +59,7 @@ export function Cart() {
           <SheetHeader className="border-b p-6">
             <SheetTitle>Carrito de compras</SheetTitle>
           </SheetHeader>
-          {/* body */}
+
           <div
             className={`grow overflow-y-auto ${
               data?.result.cartItems.length === 0
@@ -67,13 +89,14 @@ export function Cart() {
                     </button>
                   </div>
                 ) : null}
+
                 {data?.result.cartItems.map((item) => (
                   <CartItemCard key={item.id} item={item} />
                 ))}
               </div>
             )}
           </div>
-          {/* body */}
+
           {(data?.result.cartItems.length ?? 0) > 0 ? (
             <div className="mt-auto border-t bg-white py-4 px-6">
               <div className="flex justify-between items-center mb-3 text-sm">
@@ -95,43 +118,26 @@ export function Cart() {
 }
 
 export function CartItemCard({ item }: { item: CartItem }) {
-  const { mutate, isPending } = useIncrementCartItem();
+  // Placeholder sin lógica real
+  const isPending = false;
 
   const [quantity, setQuantity] = React.useState(
     item.quantity ? item.quantity : 1
   );
 
-  const onIncrement = (quantity: number) => {
-    mutate(
-      {
-        ...item,
-        quantity,
-      },
-      {
-        onSuccess: () => setQuantity(quantity),
-      }
-    );
+  const onIncrement = (q: number) => {
+    setQuantity(q);
   };
 
   return (
     <article
-      key={item.cartId}
+      key={item.id}
       className={`grid grid-cols-4 gap-4 py-3 ${
         quantity === 0 ? "animate-pulse" : ""
       }`}
     >
       <div>
-        <img
-          src={
-            item.variant?.image
-              ? `${environments.API_URL}/statics/${item.variant?.image.static.urn}`
-              : item.product.images?.[0]
-              ? `${environments.API_URL}/statics/${item.product.images[0].static.urn}`
-              : "https://galaximart.com/cdn/shop/files/WhatsAppImage2024-09-26at23.13.41_3.png?v=1727794821&width=1500"
-          }
-          alt=""
-          className="h-full object-cover"
-        />
+        <img src={""} alt="" className="h-full object-cover" />
       </div>
       <div className="col-span-3 gap-2 grid grid-cols-3 md:grid-cols-4">
         <div className="col-span-2 md:col-span-3">
@@ -139,17 +145,7 @@ export function CartItemCard({ item }: { item: CartItem }) {
             {item.product.name}
           </h3>
 
-          <p className="text-sm font-medium text-zinc-500">
-            {item.quantity} unidad
-          </p>
-
-          <div className="text-sm mt-1 mb-2">
-            <ul>
-              {item.variant.optionVariant?.map((ov, idx) => (
-                <SelectedOptions key={idx} product={item.product} ov={ov} />
-              ))}
-            </ul>
-          </div>
+          <p className="text-sm font-medium text-zinc-500">{quantity} unidad</p>
           <div className="flex items-center gap-2">
             <QuantityInputBasic
               quantity={quantity}
@@ -168,10 +164,11 @@ export function CartItemCard({ item }: { item: CartItem }) {
         </div>
         <div className="flex flex-col items-end gap-1 py-2">
           <p className="font-semibold text-red-600 text-lg">
-            S./ {(item?.variant?.price ?? 0) * quantity}
+            {item.product.price}
+            S./ {(parseIntSafety(item.product.price) ?? 0) * quantity}
           </p>
           <p className="line-through font-medium decoration-2 text-zinc-600">
-            S./ {(item?.variant?.comparisonPrice ?? 0) * quantity}
+            S./ {(parseIntSafety(item.product.compareAtPrice) ?? 0) * quantity}
           </p>
         </div>
       </div>

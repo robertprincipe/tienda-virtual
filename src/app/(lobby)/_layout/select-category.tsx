@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCategories } from "~/ecommerce/categories/queries";
+import { useCategories } from "@/services/categories/queries/category.query";
 
 export default function SelectCategory({
   value,
@@ -27,8 +27,8 @@ export default function SelectCategory({
       <SelectContent>
         <SelectGroup>
           <SelectItem value="all">Todo</SelectItem>
-          {data?.result.data.map((category) => (
-            <SelectItem key={category.id} value={category.id}>
+          {data?.map((category) => (
+            <SelectItem key={category.id} value={category.id.toString()}>
               {category.name}
             </SelectItem>
           ))}

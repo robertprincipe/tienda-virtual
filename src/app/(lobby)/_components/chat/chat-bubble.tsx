@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MessageLoading from "./message-loading";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 // ChatBubble
 const chatBubbleVariant = cva(
@@ -141,9 +141,10 @@ const ChatBubbleTimestamp: React.FC<ChatBubbleTimestampProps> = ({
 );
 
 // ChatBubbleAction
-type ChatBubbleActionProps = ButtonProps & {
-  icon: React.ReactNode;
-};
+type ChatBubbleActionProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    icon: React.ReactNode;
+  };
 
 const ChatBubbleAction: React.FC<ChatBubbleActionProps> = ({
   icon,

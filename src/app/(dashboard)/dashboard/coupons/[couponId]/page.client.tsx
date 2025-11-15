@@ -84,7 +84,9 @@ export default function CouponDetailPage({ coupon }: CouponDetailPageProps) {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold tracking-tight">{coupon.code}</h1>
+              <h1 className="text-3xl font-bold tracking-tight">
+                {coupon.code}
+              </h1>
               <Badge variant={coupon.isActive ? "default" : "secondary"}>
                 {coupon.isActive ? "Activo" : "Inactivo"}
               </Badge>
@@ -116,9 +118,7 @@ export default function CouponDetailPage({ coupon }: CouponDetailPageProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-2">
-              <p className="text-sm font-medium text-muted-foreground">
-                Valor
-              </p>
+              <p className="text-sm font-medium text-muted-foreground">Valor</p>
               <p className="text-lg">
                 {coupon.type === "percent"
                   ? `${coupon.value}%`
@@ -130,7 +130,9 @@ export default function CouponDetailPage({ coupon }: CouponDetailPageProps) {
               <p className="text-sm font-medium text-muted-foreground">
                 Subtotal mínimo
               </p>
-              <p>{coupon.minSubtotal ? formatCurrency(coupon.minSubtotal) : "-"}</p>
+              <p>
+                {coupon.minSubtotal ? formatCurrency(coupon.minSubtotal) : "-"}
+              </p>
             </div>
             <Separator />
             <div className="grid gap-2 sm:grid-cols-2">
@@ -153,7 +155,9 @@ export default function CouponDetailPage({ coupon }: CouponDetailPageProps) {
                 <p className="text-sm font-medium text-muted-foreground">
                   Inicia
                 </p>
-                <p>{coupon.startsAt ? formatDate(coupon.startsAt) : "Sin fecha"}</p>
+                <p>
+                  {coupon.startsAt ? formatDate(coupon.startsAt) : "Sin fecha"}
+                </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
@@ -184,7 +188,10 @@ export default function CouponDetailPage({ coupon }: CouponDetailPageProps) {
               ) : (
                 <ul className="mt-2 space-y-1 text-sm">
                   {coupon.products.map((product) => (
-                    <li key={product.id} className="flex items-center justify-between">
+                    <li
+                      key={product.id}
+                      className="flex items-center justify-between"
+                    >
                       <span>{product.name}</span>
                       {product.sku && (
                         <span className="text-xs text-muted-foreground">
@@ -222,14 +229,18 @@ export default function CouponDetailPage({ coupon }: CouponDetailPageProps) {
           <DialogHeader>
             <DialogTitle>¿Eliminar cupón?</DialogTitle>
             <DialogDescription>
-              Esta acción eliminará permanentemente "{coupon.code}".
+              Esta acción eliminará permanentemente &quot;{coupon.code}&quot;.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+            >
               Eliminar
             </Button>
           </DialogFooter>

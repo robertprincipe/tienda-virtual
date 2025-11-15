@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { Controller, Resolver, useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -16,13 +16,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Field,
+  FieldError,
+  FieldLabel,
+  FieldGroup,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -33,7 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { couponsTypes } from "@/drizzle/schema";
-import type { Category } from "@/schemas/category.schema";
+import type { SelectCategory } from "@/schemas/category.schema";
 import {
   couponFormSchema,
   type CouponFormValues,
@@ -41,7 +39,7 @@ import {
 import { useCreateCoupon } from "@/services/coupons/mutations/coupon.mutation";
 
 interface CreateCouponPageProps {
-  categories: Category[];
+  categories: SelectCategory[];
   products: Array<{
     id: number;
     name: string;
@@ -61,7 +59,9 @@ export default function CreateCouponPage({
   products,
 }: CreateCouponPageProps) {
   const form = useForm<CouponFormValues>({
-    resolver: zodResolver(couponFormSchema),
+    resolver: zodResolver(
+      couponFormSchema
+    ) as unknown as Resolver<CouponFormValues>,
     defaultValues: {
       code: "",
       type: "percent",
@@ -97,6 +97,14 @@ export default function CreateCouponPage({
     return Array.from(next);
   };
 
+  const numberChangeHandler =
+    (field: { onChange: (value: number | undefined) => void }) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      field.onChange(
+        event.target.value === "" ? undefined : Number(event.target.value)
+      );
+    };
+
   return (
     <div className="flex h-full flex-1 flex-col gap-6 p-6">
       <div className="flex items-center gap-4">
@@ -121,34 +129,45 @@ export default function CreateCouponPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FieldGroup>
               <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Código</FormLabel>
-                      <FormControl>
-                        <Input placeholder="PROMO2024" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="coupon-code">Código</FieldLabel>
+                      <Input
+                        {...field}
+                        id="coupon-code"
+                        placeholder="PROMO2024"
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de descuento</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona un tipo" />
-                          </SelectTrigger>
-                        </FormControl>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="coupon-type">
+                        Tipo de descuento
+                      </FieldLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger
+                          id="coupon-type"
+                          aria-invalid={fieldState.invalid}
+                        >
+                          <SelectValue placeholder="Selecciona un tipo" />
+                        </SelectTrigger>
                         <SelectContent>
                           {couponsTypes.enumValues.map((type) => (
                             <SelectItem key={type} value={type}>
@@ -157,192 +176,202 @@ export default function CreateCouponPage({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="value"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Valor</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="coupon-value">Valor</FieldLabel>
+                      <Input
+                        {...field}
+                        id="coupon-value"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="minSubtotal"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Subtotal mínimo</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="coupon-min-subtotal">
+                        Subtotal mínimo
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="coupon-min-subtotal"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center justify-between rounded-md border p-3">
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      className="flex items-center justify-between rounded-md border p-3"
+                    >
                       <div className="space-y-0.5">
-                        <FormLabel>Activo</FormLabel>
+                        <FieldLabel htmlFor="coupon-active">Activo</FieldLabel>
                         <p className="text-sm text-muted-foreground">
                           Habilita o deshabilita el cupón
                         </p>
                       </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
+                      <Switch
+                        id="coupon-active"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="maxUses"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Máximo de usos</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Ilimitado"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="coupon-max-uses">
+                        Máximo de usos
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="coupon-max-uses"
+                        type="number"
+                        placeholder="Ilimitado"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="maxUsesPerUser"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Usos por cliente</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Ilimitado"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="coupon-max-uses-per-user">
+                        Usos por cliente
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="coupon-max-uses-per-user"
+                        type="number"
+                        placeholder="Ilimitado"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="startsAt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fecha de inicio</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          value={dateInputValue(field.value)}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value
-                                ? new Date(event.target.value)
-                                : undefined
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="coupon-starts-at">
+                        Fecha de inicio
+                      </FieldLabel>
+                      <Input
+                        id="coupon-starts-at"
+                        type="date"
+                        value={dateInputValue(field.value)}
+                        onChange={(event) =>
+                          field.onChange(
+                            event.target.value
+                              ? new Date(event.target.value)
+                              : undefined
+                          )
+                        }
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="endsAt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fecha de término</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          value={dateInputValue(field.value)}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value
-                                ? new Date(event.target.value)
-                                : undefined
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="coupon-ends-at">
+                        Fecha de término
+                      </FieldLabel>
+                      <Input
+                        id="coupon-ends-at"
+                        type="date"
+                        value={dateInputValue(field.value)}
+                        onChange={(event) =>
+                          field.onChange(
+                            event.target.value
+                              ? new Date(event.target.value)
+                              : undefined
+                          )
+                        }
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="productIds"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Productos aplicables</FormLabel>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel>Productos aplicables</FieldLabel>
                       <div className="rounded-md border p-3">
                         {products.length === 0 ? (
                           <p className="text-sm text-muted-foreground">
@@ -358,7 +387,9 @@ export default function CreateCouponPage({
                               >
                                 <Checkbox
                                   id={`product-${product.id}`}
-                                  checked={field.value?.includes(product.id) ?? false}
+                                  checked={
+                                    field.value?.includes(product.id) ?? false
+                                  }
                                   onCheckedChange={(checked) =>
                                     field.onChange(
                                       toggleIdInArray(
@@ -382,16 +413,18 @@ export default function CreateCouponPage({
                           </div>
                         )}
                       </div>
-                      <FormMessage />
-                    </FormItem>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="categoryIds"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Categorías aplicables</FormLabel>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel>Categorías aplicables</FieldLabel>
                       <div className="rounded-md border p-3">
                         {categories.length === 0 ? (
                           <p className="text-sm text-muted-foreground">
@@ -407,7 +440,9 @@ export default function CreateCouponPage({
                               >
                                 <Checkbox
                                   id={`category-${category.id}`}
-                                  checked={field.value?.includes(category.id) ?? false}
+                                  checked={
+                                    field.value?.includes(category.id) ?? false
+                                  }
                                   onCheckedChange={(checked) =>
                                     field.onChange(
                                       toggleIdInArray(
@@ -424,22 +459,24 @@ export default function CreateCouponPage({
                           </div>
                         )}
                       </div>
-                      <FormMessage />
-                    </FormItem>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
+            </FieldGroup>
 
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" asChild>
-                  <Link href="/dashboard/coupons">Cancelar</Link>
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {isPending ? "Guardando..." : "Guardar cupón"}
-                </Button>
-              </div>
-            </form>
-          </Form>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" asChild>
+                <Link href="/dashboard/coupons">Cancelar</Link>
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Guardando..." : "Guardar cupón"}
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

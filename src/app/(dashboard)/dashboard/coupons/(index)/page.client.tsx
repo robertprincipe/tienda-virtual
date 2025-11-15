@@ -2,7 +2,7 @@
 
 import { BadgePercent, CalendarClock, Plus } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { createColumns } from "@/components/coupons/columns";
 import { DataTable } from "@/components/coupons/data-table";
@@ -27,10 +27,11 @@ import type { PaginatedCoupons } from "@/types/coupon";
 import { useDeleteCoupon } from "@/services/coupons/mutations/coupon.mutation";
 
 interface CouponsIndexProps {
-  coupons: PaginatedCoupons;
+  couponsPromise: Promise<PaginatedCoupons>;
 }
 
-export default function CouponsIndex({ coupons }: CouponsIndexProps) {
+export default function CouponsIndex({ couponsPromise }: CouponsIndexProps) {
+  const coupons = React.use(couponsPromise);
   const [selectedCoupon, setSelectedCoupon] = useState<CouponListItem>();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -54,12 +55,12 @@ export default function CouponsIndex({ coupons }: CouponsIndexProps) {
 
   const now = new Date();
   const stats = {
-    total: coupons.total,
-    active: coupons.data.filter((coupon) => coupon.isActive).length,
-    upcoming: coupons.data.filter(
+    total: coupons.result.total,
+    active: coupons.result.data.filter((coupon) => coupon.isActive).length,
+    upcoming: coupons.result.data.filter(
       (coupon) => coupon.startsAt && new Date(coupon.startsAt) > now
     ).length,
-    expired: coupons.data.filter(
+    expired: coupons.result.data.filter(
       (coupon) => coupon.endsAt && new Date(coupon.endsAt) < now
     ).length,
   };
@@ -95,9 +96,7 @@ export default function CouponsIndex({ coupons }: CouponsIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">
-              Cupones registrados
-            </p>
+            <p className="text-xs text-muted-foreground">Cupones registrados</p>
           </CardContent>
         </Card>
         <Card>
@@ -117,7 +116,9 @@ export default function CouponsIndex({ coupons }: CouponsIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.upcoming}</div>
-            <p className="text-xs text-muted-foreground">Pendientes de iniciar</p>
+            <p className="text-xs text-muted-foreground">
+              Pendientes de iniciar
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -130,9 +131,11 @@ export default function CouponsIndex({ coupons }: CouponsIndexProps) {
         <CardContent>
           <DataTable
             columns={columns}
-            data={coupons.data}
+            data={coupons.result.data}
             onSearch={handleSearch}
             searchPlaceholder="Buscar por código..."
+            pageCount={coupons.result.pageCount}
+            currentPage={coupons.result.currentPage}
           />
         </CardContent>
       </Card>
@@ -142,7 +145,8 @@ export default function CouponsIndex({ coupons }: CouponsIndexProps) {
           <DialogHeader>
             <DialogTitle>¿Eliminar cupón?</DialogTitle>
             <DialogDescription>
-              Esta acción eliminará "{selectedCoupon?.code}" y no se podrá revertir.
+              Esta acción eliminará "{selectedCoupon?.code}" y no se podrá
+              revertir.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

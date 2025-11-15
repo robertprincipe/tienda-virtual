@@ -2,7 +2,7 @@
 
 import { FileText, Package, Plus } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { createColumns } from "@/components/products/columns";
 import { DataTable } from "@/components/products/data-table";
@@ -27,10 +27,11 @@ import type { PaginatedProducts } from "@/types/product";
 import { useDeleteProduct } from "@/services/products/mutations/product.mutation";
 
 interface ProductsIndexProps {
-  products: PaginatedProducts;
+  productsPromise: Promise<PaginatedProducts>;
 }
 
-export default function ProductsIndex({ products }: ProductsIndexProps) {
+export default function ProductsIndex({ productsPromise }: ProductsIndexProps) {
+  const products = React.use(productsPromise);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductListItem>();
 
@@ -58,10 +59,17 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
   };
 
   const stats = useMemo(() => {
-    const total = products.total;
-    const active = products.data.filter((item) => item.status === "active").length;
-    const draft = products.data.filter((item) => item.status === "draft").length;
-    const stock = products.data.reduce((acc, item) => acc + (item.stock ?? 0), 0);
+    const total = products.result.total;
+    const active = products.result.data.filter(
+      (item) => item.status === "active"
+    ).length;
+    const draft = products.result.data.filter(
+      (item) => item.status === "draft"
+    ).length;
+    const stock = products.result.data.reduce(
+      (acc, item) => acc + (item.stock ?? 0),
+      0
+    );
 
     return { total, active, draft, stock };
   }, [products]);
@@ -88,12 +96,16 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total productos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total productos
+            </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">Productos registrados</p>
+            <p className="text-xs text-muted-foreground">
+              Productos registrados
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -108,12 +120,16 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inventario total</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Inventario total
+            </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.stock}</div>
-            <p className="text-xs text-muted-foreground">Unidades disponibles</p>
+            <p className="text-xs text-muted-foreground">
+              Unidades disponibles
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -126,9 +142,11 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
         <CardContent>
           <DataTable
             columns={columns}
-            data={products.data}
+            data={products.result.data}
             onSearch={handleSearch}
             searchPlaceholder="Buscar por nombre o SKU..."
+            pageCount={products.result.pageCount}
+            currentPage={products.result.currentPage}
           />
         </CardContent>
       </Card>
@@ -138,7 +156,8 @@ export default function ProductsIndex({ products }: ProductsIndexProps) {
           <DialogHeader>
             <DialogTitle>¿Eliminar producto?</DialogTitle>
             <DialogDescription>
-              Esta acción eliminará "{selectedProduct?.name}" y no se podrá revertir.
+              Esta acción eliminará "{selectedProduct?.name}" y no se podrá
+              revertir.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

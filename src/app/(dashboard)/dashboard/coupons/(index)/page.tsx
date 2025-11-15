@@ -12,11 +12,11 @@ const Page = async ({ searchParams }: CouponsPageProps) => {
   const resolvedSearchParams = await searchParams;
   const query = paginatedCouponsSchema.parse(resolvedSearchParams);
 
-  const coupons = await getCouponsPaginated(query);
+  const couponsPromise = getCouponsPaginated(query);
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <CouponsIndex coupons={coupons} />
+      <CouponsIndex couponsPromise={couponsPromise} />
     </div>
   );
 };

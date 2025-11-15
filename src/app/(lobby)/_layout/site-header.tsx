@@ -5,7 +5,6 @@ import * as React from "react";
 import { Icon } from "@iconify/react";
 
 import { Cart } from "./cart";
-import { Navigation } from "./navigation";
 import { useScroll, motion, useMotionValueEvent } from "framer-motion";
 
 // import SearchNavbar from "./search-navbar";
@@ -56,25 +55,6 @@ export const SiteHeader = () => {
           <CartIcon />
         </nav>
       </header>
-      <motion.div
-        variants={{
-          hidden: { opacity: 0, y: "-100%" },
-          visible: {
-            y: "0%",
-            position: "sticky",
-            top: 92.8,
-            opacity: 1,
-            background: "white",
-            zIndex: 10,
-            borderBottom: "1px solid #f0f0f0",
-          },
-        }}
-        // initial="visible"
-        animate={hidden ? "hidden" : "visible"}
-        transition={{ duration: 0.35, ease: "easeInOut" }}
-      >
-        <Navigation />
-      </motion.div>
       <Cart />
     </>
   );

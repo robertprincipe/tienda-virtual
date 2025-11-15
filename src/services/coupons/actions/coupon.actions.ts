@@ -58,9 +58,7 @@ const buildOrderBy = (input: GetPaginatedCouponsQueryProps) => {
         ? asc(coupons.startsAt)
         : desc(coupons.startsAt);
     case "endsAt":
-      return direction === "asc"
-        ? asc(coupons.endsAt)
-        : desc(coupons.endsAt);
+      return direction === "asc" ? asc(coupons.endsAt) : desc(coupons.endsAt);
     case "createdAt":
     default:
       return direction === "asc"
@@ -144,14 +142,26 @@ export const getCouponsPaginated = async (
   const pageCount = Math.ceil(total / input.per_page) || 1;
 
   return {
-    data: data as CouponListItem[],
-    total,
-    pageCount,
-    nextPage: input.page < pageCount ? input.page + 1 : null,
+    message: "Coupons fetched successfully",
+    result: {
+      data: data as CouponListItem[],
+      count: data.length,
+      pageCount,
+      total,
+      nextPage: input.page < pageCount ? input.page + 1 : null,
+      currentPage: input.page,
+      minMax: {
+        min: data.length > 0 ? (input.page - 1) * input.per_page + 1 : 0,
+        max:
+          data.length > 0 ? (input.page - 1) * input.per_page + data.length : 0,
+      },
+    },
   };
 };
 
-export const getCoupon = async (id: number): Promise<CouponWithRelations | null> => {
+export const getCoupon = async (
+  id: number
+): Promise<CouponWithRelations | null> => {
   const coupon = await db.query.coupons.findFirst({
     where: eq(coupons.id, id),
   });
@@ -235,7 +245,9 @@ export const createCoupon = async (input: CouponFormValues) => {
   };
 };
 
-export const updateCoupon = async (input: CouponFormValues & { id: number }) => {
+export const updateCoupon = async (
+  input: CouponFormValues & { id: number }
+) => {
   const { id, ...rest } = input;
   const data = couponFormSchema.parse(rest);
 
@@ -260,15 +272,19 @@ export const updateCoupon = async (input: CouponFormValues & { id: number }) => 
     await tx.delete(couponCategories).where(eq(couponCategories.couponId, id));
 
     if (data.productIds?.length) {
-      await tx.insert(couponProducts).values(
-        data.productIds.map((productId) => ({ couponId: id, productId }))
-      );
+      await tx
+        .insert(couponProducts)
+        .values(
+          data.productIds.map((productId) => ({ couponId: id, productId }))
+        );
     }
 
     if (data.categoryIds?.length) {
-      await tx.insert(couponCategories).values(
-        data.categoryIds.map((categoryId) => ({ couponId: id, categoryId }))
-      );
+      await tx
+        .insert(couponCategories)
+        .values(
+          data.categoryIds.map((categoryId) => ({ couponId: id, categoryId }))
+        );
     }
 
     return updated;

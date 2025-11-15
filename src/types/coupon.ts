@@ -7,10 +7,19 @@ import type { CouponFiltersInput } from "@/schemas/coupon.schema";
 export type CouponFilters = CouponFiltersInput;
 
 export interface PaginatedCoupons {
-  data: CouponListItem[];
-  pageCount: number;
-  total: number;
-  nextPage: number | null;
+  message: string;
+  result: {
+    data: CouponListItem[];
+    count: number;
+    pageCount: number;
+    total: number;
+    nextPage: number | null;
+    currentPage: number;
+    minMax: {
+      min: number;
+      max: number;
+    };
+  };
 }
 
 export type CouponDetail = CouponWithRelations;

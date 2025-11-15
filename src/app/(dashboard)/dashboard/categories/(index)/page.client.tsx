@@ -25,12 +25,16 @@ import { type PaginatedCategories } from "@/types/category";
 import Link from "next/link";
 import { useDeleteCategory } from "@/services/categories/mutations/category.mutation";
 import { SelectCategory } from "@/schemas/category.schema";
+import React from "react";
 
 interface CategoriesIndexProps {
-  categories: PaginatedCategories;
+  categoriesPromise: Promise<PaginatedCategories>;
 }
 
-export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
+export default function CategoriesIndex({
+  categoriesPromise,
+}: CategoriesIndexProps) {
+  const categories = React.use(categoriesPromise);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<
     SelectCategory | undefined
@@ -92,7 +96,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{categories.total}</div>
+            <div className="text-2xl font-bold">{categories.result.total}</div>
             <p className="text-xs text-muted-foreground">
               Categorías registradas
             </p>
@@ -105,7 +109,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {categories.data.filter((c) => c.isActive).length}
+              {categories.result.data.filter((c) => c.isActive).length}
             </div>
             <p className="text-xs text-muted-foreground">Categorías activas</p>
           </CardContent>
@@ -117,7 +121,10 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {categories.data.filter((c) => (c.productsCount ?? 0) > 0).length}
+              {
+                categories.result.data.filter((c) => (c.productsCount ?? 0) > 0)
+                  .length
+              }
             </div>
             <p className="text-xs text-muted-foreground">
               Categorías con productos
@@ -137,9 +144,11 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
         <CardContent>
           <DataTable
             columns={columns}
-            data={categories.data}
+            data={categories.result.data}
             onSearch={handleSearch}
             searchPlaceholder="Buscar por nombre o slug..."
+            pageCount={categories.result.pageCount}
+            currentPage={categories.result.currentPage}
           />
         </CardContent>
       </Card>

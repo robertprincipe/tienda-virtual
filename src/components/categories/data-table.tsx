@@ -2,7 +2,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
@@ -28,6 +27,8 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   onSearch?: (value: string) => void;
   searchPlaceholder?: string;
+  pageCount?: number;
+  currentPage?: number;
 }
 
 export function DataTable<TData, TValue>({
@@ -35,6 +36,8 @@ export function DataTable<TData, TValue>({
   data,
   onSearch,
   searchPlaceholder = "Buscar...",
+  pageCount = 1,
+  currentPage = 1,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -45,7 +48,8 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
+    pageCount,
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -57,6 +61,10 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: {
+        pageIndex: currentPage - 1,
+        pageSize: data.length || 10,
+      },
     },
   });
 
@@ -123,23 +131,36 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Anterior
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Siguiente
-        </Button>
+      <div className="flex items-center justify-between py-4">
+        <div className="text-sm text-muted-foreground">
+          Página {currentPage} de {pageCount}
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const params = new URLSearchParams(window.location.search);
+              params.set("page", String(currentPage - 1));
+              window.location.href = `?${params.toString()}`;
+            }}
+            disabled={currentPage <= 1}
+          >
+            Anterior
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const params = new URLSearchParams(window.location.search);
+              params.set("page", String(currentPage + 1));
+              window.location.href = `?${params.toString()}`;
+            }}
+            disabled={currentPage >= pageCount}
+          >
+            Siguiente
+          </Button>
+        </div>
       </div>
     </div>
   );

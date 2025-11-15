@@ -12,11 +12,11 @@ const Page = async (props: CategoriesPageProps) => {
 
   const search = panginatedCategoriesSchema.parse(searchParams);
 
-  const categories = await getCategoriesInfinite(search);
+  const categoriesPromise = getCategoriesInfinite(search);
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <CategoriesIndex categories={categories} />
+      <CategoriesIndex categoriesPromise={categoriesPromise} />
     </div>
   );
 };

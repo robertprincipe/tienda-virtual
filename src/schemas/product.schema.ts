@@ -134,10 +134,29 @@ export const paginatedProductsSchema = z.object({
   per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
   search: z.string().optional(),
-  categoryId: z.coerce.number().optional(),
+  categoryId: z
+    .union([z.coerce.number(), z.string()])
+    .transform((val) => {
+      if (typeof val === "string") {
+        return val.split(",").map(Number).filter(Boolean);
+      }
+      return [val];
+    })
+    .optional(),
   status: z.enum(productStatuses.enumValues).optional(),
+  minPrice: z.coerce.number().optional(),
+  maxPrice: z.coerce.number().optional(),
+  inStock: z.coerce.boolean().optional(),
 });
 
 export type GetPaginatedProductsQueryProps = z.infer<
   typeof paginatedProductsSchema
 >;
+
+// Schema para productos públicos (lobby) - solo activos con 12 por página
+export const publicProductsSchema = paginatedProductsSchema.extend({
+  per_page: z.coerce.number().default(12),
+  status: z.literal("active").default("active"),
+});
+
+export type GetPublicProductsQueryProps = z.infer<typeof publicProductsSchema>;

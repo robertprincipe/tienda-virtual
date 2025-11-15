@@ -74,10 +74,15 @@ export const getCategoriesInfinite = async (
   const pageCount = Math.ceil(total / input.per_page);
 
   return {
-    data,
-    pageCount,
-    total,
-    nextPage: input.page < pageCount ? input.page + 1 : null,
+    message: "Categories fetched successfully",
+    result: {
+      data,
+      count: data.length,
+      pageCount,
+      total,
+      nextPage: input.page < pageCount ? input.page + 1 : null,
+      currentPage: input.page,
+    },
   };
 };
 
@@ -95,6 +100,24 @@ export const getCategories = async (filters?: { notInIds: number[] }) => {
 export const getCategory = async (id: number) => {
   const category = await db.query.categories.findFirst({
     where: eq(categories.id, id),
+    with: {
+      parent: true,
+      children: true,
+    },
+    extras: {
+      productsCount:
+        sql<number>`(select count(*) from products where products.category_id = ${categories.id})`.as(
+          "products_count"
+        ),
+    },
+  });
+
+  return category;
+};
+
+export const getCategoryBySlug = async (slug: string) => {
+  const category = await db.query.categories.findFirst({
+    where: eq(categories.slug, slug),
     with: {
       parent: true,
       children: true,

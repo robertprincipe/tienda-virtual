@@ -20,8 +20,13 @@ export interface CategoryFilters {
 }
 
 export interface PaginatedCategories {
-  data: SelectCategory[];
-  pageCount: number;
-  total: number;
-  nextPage: number | null;
+  message: string;
+  result: {
+    data: SelectCategory[];
+    count: number;
+    pageCount: number;
+    total: number;
+    nextPage: number | null;
+    currentPage: number;
+  };
 }

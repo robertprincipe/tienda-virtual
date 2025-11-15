@@ -28,7 +28,7 @@ export const useCategoriesInfinity = (searchTerm: string) => {
     queryFn: ({ pageParam }) =>
       getCategoriesInfinite({
         page: pageParam,
-        per_page: 10,
+        per_page: 2,
         name: searchTerm,
       }),
     // fetchCategories(pageParam as string | null, searchTerm),
@@ -39,7 +39,7 @@ export const useCategoriesInfinity = (searchTerm: string) => {
 
     // Function to determine the next pageParam (cursor) based on the last fetched page
     // This is used by react-query to know how to fetch the next page
-    getNextPageParam: (lastPage) => lastPage?.nextPage ?? undefined,
+    getNextPageParam: (lastPage) => lastPage?.result.nextPage ?? undefined,
   });
 };
 

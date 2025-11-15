@@ -50,12 +50,34 @@ const buildOrderBy = (sort?: string) => {
   }
 };
 
-const buildFilters = (input: GetPaginatedProductsQueryProps) =>
-  and(
+const buildFilters = (input: GetPaginatedProductsQueryProps) => {
+  const categoryFilter =
+    input.categoryId &&
+    Array.isArray(input.categoryId) &&
+    input.categoryId.length > 0
+      ? sql`${products.categoryId} IN (${sql.join(
+          input.categoryId.map((id) => sql`${id}`),
+          sql`, `
+        )})`
+      : undefined;
+
+  return and(
     input.search ? ilike(products.name, `%${input.search}%`) : undefined,
-    input.categoryId ? eq(products.categoryId, input.categoryId) : undefined,
-    input.status ? eq(products.status, input.status) : undefined
+    categoryFilter,
+    input.status ? eq(products.status, input.status) : undefined,
+    input.minPrice
+      ? sql`CAST(${products.price} AS DECIMAL) >= ${input.minPrice}`
+      : undefined,
+    input.maxPrice
+      ? sql`CAST(${products.price} AS DECIMAL) <= ${input.maxPrice}`
+      : undefined,
+    input.inStock !== undefined
+      ? input.inStock
+        ? sql`${products.stock} > 0`
+        : sql`${products.stock} = 0 OR ${products.stock} IS NULL`
+      : undefined
   );
+};
 
 export const getProductsPaginated = async (
   input: GetPaginatedProductsQueryProps
@@ -105,10 +127,20 @@ export const getProductsPaginated = async (
   const pageCount = Math.ceil(total / input.per_page);
 
   return {
-    data: data as ProductListItem[],
-    total,
-    pageCount,
-    nextPage: input.page < pageCount ? input.page + 1 : null,
+    message: "Products fetched successfully",
+    result: {
+      data: data as ProductListItem[],
+      count: data.length,
+      pageCount,
+      total,
+      nextPage: input.page < pageCount ? input.page + 1 : null,
+      currentPage: input.page,
+      minMax: {
+        min: data.length > 0 ? (input.page - 1) * input.per_page + 1 : 0,
+        max:
+          data.length > 0 ? (input.page - 1) * input.per_page + data.length : 0,
+      },
+    },
   };
 };
 
@@ -140,12 +172,24 @@ export const getProduct = async (id: number) => {
   return product as ProductWithRelations | null;
 };
 
+export const getProductBySlug = async (slug: string) => {
+  const product = await db.query.products.findFirst({
+    where: eq(products.slug, slug),
+    with: {
+      category: true,
+      images: {
+        orderBy: (productImages, { asc }) => asc(productImages.sortOrder),
+      },
+    },
+  });
+
+  return product as ProductWithRelations | null;
+};
+
 export const createProduct = async (input: ProductFormValues) => {
   const data = productFormSchema.parse(input);
 
-  const slugValue = data.slug?.trim()
-    ? slugify(data.slug)
-    : slugify(data.name);
+  const slugValue = data.slug?.trim() ? slugify(data.slug) : slugify(data.name);
 
   const result = await db.transaction(async (tx) => {
     const [created] = await tx
@@ -197,9 +241,7 @@ export const updateProduct = async (
   const { id, ...rest } = input;
   const data = productFormSchema.parse(rest);
 
-  const slugValue = data.slug?.trim()
-    ? slugify(data.slug)
-    : slugify(data.name);
+  const slugValue = data.slug?.trim() ? slugify(data.slug) : slugify(data.name);
 
   const result = await db.transaction(async (tx) => {
     const [updated] = await tx

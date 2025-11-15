@@ -12,11 +12,11 @@ const Page = async ({ searchParams }: ProductsPageProps) => {
   const resolvedSearchParams = await searchParams;
   const search = paginatedProductsSchema.parse(resolvedSearchParams);
 
-  const products = await getProductsPaginated(search);
+  const productsPromise = getProductsPaginated(search);
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <ProductsIndex products={products} />
+      <ProductsIndex productsPromise={productsPromise} />
     </div>
   );
 };

@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export default function Index() {
   return (
-    <div className="">
+    <div>
       <div className="bg-zinc-100">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 container py-3">
           <div className="flex items-center gap-3 justify-start">

@@ -39,16 +39,14 @@ import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { z } from "zod/v4";
 import { uploadFilesApi } from "@/services/upload/apis/upload.api";
+import { parseIntSafety } from "@/lib/utils";
+import { useCategories } from "@/services/categories/queries/category.query";
 
 interface EditCategoryProps {
   category: SelectCategory;
-  categories: SelectCategory[];
 }
 
-export default function EditCategory({
-  category,
-  categories,
-}: EditCategoryProps) {
+export default function EditCategory({ category }: EditCategoryProps) {
   const [fileError, setFileError] = useState<string>("");
   const [existingFiles, setExistingFiles] = useState<ExistingFile[]>(
     category.imageUrl
@@ -62,7 +60,13 @@ export default function EditCategory({
       : []
   );
 
+  const { data: categories } = useCategories({
+    notInIds: [category.id],
+  });
+
   const [imageFiles, setImageFiles] = useState<File[]>();
+
+  const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const { mutate, isPending } = useUpdateCategory();
 
@@ -85,7 +89,9 @@ export default function EditCategory({
     }
 
     if (imageFiles && imageFiles.length > 0) {
+      setIsUploading(true);
       const images = await uploadFilesApi(imageFiles);
+      setIsUploading(false);
 
       if (images.length === 0) {
         setFileError("Error al subir la imagen");
@@ -199,44 +205,48 @@ export default function EditCategory({
                 onChange={handleFilesChange}
                 onError={setFileError}
                 error={form.formState.errors.imageUrl?.message || fileError}
-                disabled={isPending}
+                disabled={isPending || isUploading}
               />
 
-              {/* Categoría Padre */}
-              <FormField
-                control={form.control}
-                name="parentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Categoría Padre</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value?.toString()}
-                        onValueChange={(value) => field.onChange(value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Ninguna (categoría raíz)" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem
-                              key={category.id}
-                              value={category.id?.toString() || ""}
-                            >
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
+              {categories && categories.length > 0 ? (
+                <FormField
+                  control={form.control}
+                  name="parentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoría Padre</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value?.toString()}
+                          onValueChange={(value) =>
+                            field.onChange(parseIntSafety(value))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Ninguna (categoría raíz)" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories?.map((category) => (
+                              <SelectItem
+                                key={category.id}
+                                value={category.id?.toString() || ""}
+                              >
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
 
-                    <p className="text-sm text-muted-foreground">
-                      Selecciona una categoría padre para crear una subcategoría
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <p className="text-sm text-muted-foreground">
+                        Selecciona una categoría padre para crear una
+                        subcategoría
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : null}
 
               <FormField
                 control={form.control}
@@ -284,8 +294,10 @@ export default function EditCategory({
 
               {/* Botones */}
               <div className="flex gap-4">
-                <Button type="submit" disabled={isPending}>
-                  {isPending ? "Guardando..." : "Guardar Cambios"}
+                <Button type="submit" disabled={isPending || isUploading}>
+                  {isPending || isUploading
+                    ? "Guardando..."
+                    : "Guardar Cambios"}
                 </Button>
                 <Button type="button" variant="outline" asChild>
                   <Link href="/dashboard/categories">Cancelar</Link>

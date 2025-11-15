@@ -33,7 +33,9 @@ export default function ShowCategory() {
   const params = useParams<{
     categoryId: string;
   }>();
-  const { data: category } = useCategory(parseIntSafety(params.categoryId));
+  const { data: category, isLoading } = useCategory(
+    parseIntSafety(params.categoryId)
+  );
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const { mutate } = useDeleteCategory();
@@ -41,6 +43,10 @@ export default function ShowCategory() {
   const handleDelete = () => {
     mutate(category?.id || 1);
   };
+
+  if (isLoading) {
+    return <div>Cargando...</div>;
+  }
 
   if (!category) {
     notFound();

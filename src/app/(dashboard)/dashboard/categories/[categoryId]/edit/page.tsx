@@ -14,13 +14,11 @@ const Page = async (props: PageProps) => {
 
   const data = await getCategory(params.categoryId);
 
-  const categories = await getCategories();
-
   if (!data) {
     notFound();
   }
 
-  return <EditCategory category={data} categories={categories} />;
+  return <EditCategory category={data} />;
 };
 
 export default Page;

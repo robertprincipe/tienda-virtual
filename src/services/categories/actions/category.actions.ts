@@ -11,6 +11,7 @@ import {
   eq,
   getTableColumns,
   ilike,
+  notInArray,
   or,
   sql,
 } from "drizzle-orm";
@@ -41,7 +42,7 @@ export const getCategoriesInfinite = async (
         parent,
       })
       .from(categories)
-      .leftJoin(parent, eq(parent.id, parent.parentId))
+      .leftJoin(parent, eq(parent.id, categories.parentId))
       .offset(offset)
       .limit(input.per_page)
       .where(
@@ -80,9 +81,15 @@ export const getCategoriesInfinite = async (
   };
 };
 
-export const getCategories = async () => {
-  const categories = await db.query.categories.findMany();
-  return categories;
+export const getCategories = async (filters?: { notInIds: number[] }) => {
+  const data = await db.query.categories.findMany({
+    where: filters
+      ? filters.notInIds
+        ? notInArray(categories.id, filters.notInIds)
+        : undefined
+      : undefined,
+  });
+  return data;
 };
 
 export const getCategory = async (id: number) => {

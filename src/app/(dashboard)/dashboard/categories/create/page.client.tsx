@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { uploadFilesApi } from "@/services/upload/apis/upload.api";
+import { parseIntSafety } from "@/lib/utils";
 
 interface CreateCategoryProps {
   categories: Category[];
@@ -48,19 +49,32 @@ export default function CreateCategory({ categories }: CreateCategoryProps) {
 
   const [imageFiles, setImageFiles] = useState<File[]>();
 
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+
   const form = useForm({
     resolver: zodResolver(categoriesSchema),
+    defaultValues: {
+      name: "",
+      slug: "",
+      parentId: undefined,
+      description: "",
+      isActive: true,
+      imageUrl: "",
+    },
   });
 
   const { mutate, isPending } = useCreateCategory();
 
   const submit = async (values: z.infer<typeof categoriesSchema>) => {
+    setIsUploading(true);
     if (!imageFiles || imageFiles.length === 0) {
       setFileError("La imagen es obligatoria");
       return;
     }
 
     const images = await uploadFilesApi(imageFiles);
+
+    setIsUploading(false);
 
     if (images.length === 0) {
       setFileError("Error al subir la imagen");
@@ -157,7 +171,7 @@ export default function CreateCategory({ categories }: CreateCategoryProps) {
                 onChange={handleFilesChange}
                 onError={setFileError}
                 error={form.formState.errors.imageUrl?.message || fileError}
-                disabled={isPending}
+                disabled={isPending || isUploading}
               />
 
               {/* Categoría Padre */}
@@ -170,7 +184,9 @@ export default function CreateCategory({ categories }: CreateCategoryProps) {
                     <FormControl>
                       <Select
                         value={field.value?.toString()}
-                        onValueChange={(value) => field.onChange(value)}
+                        onValueChange={(value) =>
+                          field.onChange(parseIntSafety(value))
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Ninguna (categoría raíz)" />
@@ -245,8 +261,8 @@ export default function CreateCategory({ categories }: CreateCategoryProps) {
 
               {/* Botones */}
               <div className="flex gap-4">
-                <Button type="submit" disabled={isPending}>
-                  {isPending ? "Creando..." : "Crear Categoría"}
+                <Button type="submit" disabled={isPending || isUploading}>
+                  {isPending || isUploading ? "Creando..." : "Crear Categoría"}
                 </Button>
                 <Button type="button" variant="outline" asChild>
                   <Link href="/dashboard/categories">Cancelar</Link>

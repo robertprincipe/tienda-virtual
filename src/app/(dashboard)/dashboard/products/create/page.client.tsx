@@ -3,7 +3,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, Resolver, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -17,13 +17,11 @@ import {
 } from "@/components/ui/card";
 import { FileUpload } from "@/components/ui/file-upload";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Field,
+  FieldError,
+  FieldLabel,
+  FieldGroup,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -48,13 +46,17 @@ interface CreateProductPageProps {
   categories: Category[];
 }
 
-export default function CreateProductPage({ categories }: CreateProductPageProps) {
+export default function CreateProductPage({
+  categories,
+}: CreateProductPageProps) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productFormSchema),
+    resolver: zodResolver(
+      productFormSchema
+    ) as unknown as Resolver<ProductFormValues>,
     defaultValues: {
       name: "",
       slug: "",
@@ -76,7 +78,7 @@ export default function CreateProductPage({ categories }: CreateProductPageProps
 
   const { mutate, isPending } = useCreateProduct();
 
-  const onSubmit = async (values: z.infer<typeof productFormSchema>) => {
+  const onSubmit: SubmitHandler<ProductFormValues> = async (values) => {
     if (!imageFiles || imageFiles.length === 0) {
       setFileError("Debes subir al menos una imagen");
       return;
@@ -108,6 +110,14 @@ export default function CreateProductPage({ categories }: CreateProductPageProps
 
   const isSubmitting = isPending || isUploading;
 
+  const numberChangeHandler =
+    (field: { onChange: (value: number | undefined) => void }) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      field.onChange(
+        event.target.value === "" ? undefined : Number(event.target.value)
+      );
+    };
+
   return (
     <div className="flex h-full flex-1 flex-col gap-6 p-6">
       <div className="flex items-center gap-4">
@@ -132,66 +142,88 @@ export default function CreateProductPage({ categories }: CreateProductPageProps
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FieldGroup>
               <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nombre</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Cámara profesional" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-name">Nombre</FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-name"
+                        placeholder="Cámara profesional"
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Slug (opcional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="camara-profesional" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-slug">
+                        Slug (opcional)
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-slug"
+                        placeholder="camara-profesional"
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="sku"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>SKU</FormLabel>
-                      <FormControl>
-                        <Input placeholder="SKU-001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-sku">SKU</FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-sku"
+                        placeholder="SKU-001"
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="categoryId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Categoría</FormLabel>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-category">
+                        Categoría
+                      </FieldLabel>
                       <Select
                         value={field.value?.toString()}
-                        onValueChange={(value) => field.onChange(parseIntSafety(value))}
+                        onValueChange={(value) =>
+                          field.onChange(parseIntSafety(value))
+                        }
                       >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona una categoría" />
-                          </SelectTrigger>
-                        </FormControl>
+                        <SelectTrigger
+                          id="product-category"
+                          aria-invalid={fieldState.invalid}
+                        >
+                          <SelectValue placeholder="Selecciona una categoría" />
+                        </SelectTrigger>
                         <SelectContent>
                           {categories.map((category) => (
                             <SelectItem
@@ -203,278 +235,285 @@ export default function CreateProductPage({ categories }: CreateProductPageProps
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Estado</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona un estado" />
-                          </SelectTrigger>
-                        </FormControl>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-status">Estado</FieldLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger
+                          id="product-status"
+                          aria-invalid={fieldState.invalid}
+                        >
+                          <SelectValue placeholder="Selecciona un estado" />
+                        </SelectTrigger>
                         <SelectContent>
                           {productStatuses.enumValues.map((status) => (
                             <SelectItem key={status} value={status}>
                               {status === "active"
                                 ? "Activo"
                                 : status === "draft"
-                                  ? "Borrador"
-                                  : "Archivado"}
+                                ? "Borrador"
+                                : "Archivado"}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="shortDesc"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descripción corta</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Texto breve para listados" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-short-desc">
+                        Descripción corta
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-short-desc"
+                        placeholder="Texto breve para listados"
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
-              <FormField
-                control={form.control}
+              <Controller
                 name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descripción detallada</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={5}
-                        placeholder="Describe las características principales"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="product-description">
+                      Descripción detallada
+                    </FieldLabel>
+                    <Textarea
+                      {...field}
+                      id="product-description"
+                      rows={5}
+                      placeholder="Describe las características principales"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
                 )}
               />
 
               <div className="grid gap-4 md:grid-cols-3">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Precio</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-price">Precio</FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-price"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="compareAtPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Precio antes</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-compare-price">
+                        Precio antes
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-compare-price"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="purchasePrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Costo</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-purchase-price">
+                        Costo
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-purchase-price"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="stock"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Inventario</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="0"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-stock">
+                        Inventario
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-stock"
+                        type="number"
+                        placeholder="0"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="weightGrams"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Peso (g)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-weight">Peso (g)</FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-weight"
+                        type="number"
+                        step="0.01"
+                        placeholder="0"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <FormField
-                  control={form.control}
+                <Controller
                   name="length"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Largo (cm)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-length">
+                        Largo (cm)
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-length"
+                        type="number"
+                        step="0.01"
+                        placeholder="0"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="width"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ancho (cm)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-width">
+                        Ancho (cm)
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-width"
+                        type="number"
+                        step="0.01"
+                        placeholder="0"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
-                <FormField
-                  control={form.control}
+                <Controller
                   name="height"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Alto (cm)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0"
-                          value={field.value ?? ""}
-                          onChange={(event) =>
-                            field.onChange(
-                              event.target.value === ""
-                                ? undefined
-                                : Number(event.target.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="product-height">
+                        Alto (cm)
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="product-height"
+                        type="number"
+                        step="0.01"
+                        placeholder="0"
+                        value={field.value ?? ""}
+                        onChange={numberChangeHandler(field)}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
                 />
               </div>
@@ -495,17 +534,17 @@ export default function CreateProductPage({ categories }: CreateProductPageProps
                   disabled={isSubmitting}
                 />
               </div>
+            </FieldGroup>
 
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" type="button" asChild>
-                  <Link href="/dashboard/products">Cancelar</Link>
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Guardando..." : "Guardar producto"}
-                </Button>
-              </div>
-            </form>
-          </Form>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" type="button" asChild>
+                <Link href="/dashboard/products">Cancelar</Link>
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Guardando..." : "Guardar producto"}
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

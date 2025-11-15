@@ -1,5 +1,5 @@
 import { SelectCategory } from "@/schemas/category.schema";
-import { Product } from "./product";
+import { SelectProduct } from "@/schemas/product.schema";
 
 export interface Coupon {
   id: number;
@@ -19,7 +19,7 @@ export interface Coupon {
   is_valid?: boolean;
   redemptions_count?: number;
   remaining_uses?: number | null;
-  products?: Product[];
+  products?: SelectProduct[];
   categories?: SelectCategory[];
   products_count?: number;
   categories_count?: number;

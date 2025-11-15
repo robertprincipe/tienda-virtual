@@ -1,4 +1,4 @@
-import { Product } from './product';
+import { SelectProduct } from "@/schemas/product.schema";
 
 export interface CartItem {
   id: number;
@@ -9,13 +9,13 @@ export interface CartItem {
   unit_price_formatted: string;
   subtotal: number;
   subtotal_formatted: string;
-  product: Product;
+  product: SelectProduct;
 }
 
 export interface Cart {
   id: number;
   user_id: number;
-  status: 'active' | 'completed' | 'abandoned';
+  status: "active" | "completed" | "abandoned";
   coupon_code: string | null;
   expires_at: string | null;
   created_at: string;

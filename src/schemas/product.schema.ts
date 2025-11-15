@@ -28,8 +28,7 @@ const requiredNumber = (message: string, options?: { min?: number }) =>
     preprocessNumber,
     z
       .number({
-        required_error: message,
-        invalid_type_error: message,
+        error: message,
       })
       .min(options?.min ?? 0, message)
   );
@@ -40,7 +39,7 @@ const optionalNumber = (message?: string, options?: { min?: number }) =>
       preprocessNumber,
       z
         .number({
-          invalid_type_error: message ?? "Valor inválido",
+          error: message ?? "Valor inválido",
         })
         .min(options?.min ?? 0, message)
     )
@@ -57,13 +56,13 @@ const optionalString = (max = 255) =>
 export const productInsertSchema = createInsertSchema(products, {
   name: z
     .string({
-      required_error: "El nombre es obligatorio",
+      error: "El nombre es obligatorio",
     })
     .min(1, "El nombre es obligatorio"),
   slug: optionalString(230),
   sku: z
     .string({
-      required_error: "El SKU es obligatorio",
+      error: "El SKU es obligatorio",
     })
     .min(1, "El SKU es obligatorio"),
   categoryId: requiredNumber("Selecciona una categoría", { min: 1 }).pipe(

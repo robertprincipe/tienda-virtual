@@ -12,12 +12,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { UserInfo } from "@/components/user-info";
-// import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from "@/hooks/use-mobile";
-import { type SharedData } from "@/types";
+import type { SessionUser } from "@/types/auth";
 import { ChevronsUpDown } from "lucide-react";
+import { UserMenuContent } from "@/components/user-menu-content";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-export function NavUser() {
+interface NavUserProps {
+  user?: SessionUser | null;
+}
+
+export function NavUser({ user }: NavUserProps) {
   const { state } = useSidebar();
   const isMobile = useIsMobile();
 
@@ -30,7 +36,13 @@ export function NavUser() {
               size="lg"
               className="group text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent"
             >
-              {/* <UserInfo user={auth.user} /> */}
+              {user ? (
+                <UserInfo user={user} />
+              ) : (
+                <span className="flex-1 text-left text-sm font-medium">
+                  Invitado
+                </span>
+              )}
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -41,7 +53,21 @@ export function NavUser() {
               isMobile ? "bottom" : state === "collapsed" ? "left" : "bottom"
             }
           >
-            {/* <UserMenuContent user={auth.user} /> */}
+            {user ? (
+              <UserMenuContent user={user} />
+            ) : (
+              <div className="flex flex-col gap-2 p-2 text-sm">
+                <p className="text-muted-foreground">
+                  Inicia sesión para administrar tu cuenta.
+                </p>
+                <Button asChild size="sm">
+                  <Link href="/login">Iniciar sesión</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/register">Crear cuenta</Link>
+                </Button>
+              </div>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

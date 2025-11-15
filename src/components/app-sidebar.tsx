@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import { type NavItem } from "@/types";
+import type { SessionUser } from "@/types/auth";
 import Link from "next/link";
 import {
   FolderTree,
@@ -65,7 +66,11 @@ const footerNavItems: NavItem[] = [
   },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  user?: SessionUser | null;
+}
+
+export function AppSidebar({ user }: AppSidebarProps = {}) {
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader>
@@ -86,7 +91,7 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <NavFooter items={footerNavItems} className="mt-auto" />
-        <NavUser />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );

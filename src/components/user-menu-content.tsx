@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -6,17 +8,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserInfo } from "@/components/user-info";
 
-import { type User } from "@/types";
-
+import type { SessionUser } from "@/types/auth";
 import { LogOut, Settings } from "lucide-react";
 import Link from "next/link";
+import { useLogoutMutation } from "@/services/auth/mutations/auth.mutation";
 
 interface UserMenuContentProps {
-  user: User;
+  user: SessionUser;
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
-  // const cleanup = useMobileNavigation();
+  const { mutate, isPending } = useLogoutMutation();
 
   return (
     <>
@@ -41,17 +43,15 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
-      <DropdownMenuItem asChild>
-        <Link
-          className="block w-full"
-          href={"/logout"}
-          as="button"
-          //   onClick={handleLogout}
-          data-test="logout-button"
-        >
-          <LogOut className="mr-2" />
-          Log out
-        </Link>
+      <DropdownMenuItem
+        onSelect={(event) => {
+          event.preventDefault();
+          mutate();
+        }}
+        disabled={isPending}
+      >
+        <LogOut className="mr-2" />
+        {isPending ? "Cerrando sesión..." : "Cerrar sesión"}
       </DropdownMenuItem>
     </>
   );

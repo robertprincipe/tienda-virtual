@@ -52,7 +52,7 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 255 }).notNull(),
   paternalLastName: varchar("paternal_last_name", { length: 255 }),
   maternalLastName: varchar("maternal_last_name", { length: 255 }),
-  fullName: varchar("full_name", { length: 150 }),
+  photoUrl: varchar("photo_url", { length: 500 }),
   line1: varchar("line1", { length: 200 }),
   line2: varchar("line2", { length: 200 }),
   city: varchar("city", { length: 100 }),

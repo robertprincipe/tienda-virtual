@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/carousel";
 import { Card } from "@/components/ui/card";
 import type { ProductWithRelations } from "@/schemas/product.schema";
+import type { SessionUser } from "@/types/auth";
+import { ProductReviewForm } from "@/components/product-review-form";
 import {
   Minus,
   Plus,
@@ -26,10 +28,14 @@ import {
 
 interface ProductDetailClientProps {
   product: ProductWithRelations;
+  user: SessionUser | null;
+  hasReviewed: boolean;
 }
 
 export default function ProductDetailClient({
   product,
+  user,
+  hasReviewed,
 }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [showFloatingButton, setShowFloatingButton] = useState(false);
@@ -424,6 +430,13 @@ export default function ProductDetailClient({
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Review Form Section */}
+      {user && !hasReviewed && (
+        <div className="container mx-auto px-4 py-8">
+          <ProductReviewForm productId={product.id} />
         </div>
       )}
     </>

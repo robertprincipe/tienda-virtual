@@ -6,8 +6,11 @@ import { PropsWithChildren } from "react";
 
 import { WhatsAppButton } from "./_components/whatsapp-button";
 import { CartInitializer } from "@/components/cart/cart-initializer";
+import { getFooterInfo } from "@/services/store-settings/actions/public-settings.actions";
 
-export default function LobbyLayout({ children }: PropsWithChildren) {
+export default async function LobbyLayout({ children }: PropsWithChildren) {
+  const settings = await getFooterInfo();
+
   return (
     <>
       <SiteHeader />
@@ -16,7 +19,7 @@ export default function LobbyLayout({ children }: PropsWithChildren) {
 
       <CartInitializer />
 
-      <WhatsAppButton />
+      <WhatsAppButton phone={settings.phone} logoUrl={settings.logoUrl} />
     </>
   );
 }

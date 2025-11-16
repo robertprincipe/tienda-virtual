@@ -13,23 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { OrderListItem } from "@/schemas/order.schema";
-
-const formatCurrency = (value?: string | null) => {
-  if (!value) {
-    return "S/.0.00";
-  }
-
-  const numericValue = Number(value);
-  if (Number.isNaN(numericValue)) {
-    return "S/.0.00";
-  }
-
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(numericValue);
-};
+import { formatCurrency } from "@/lib/currency";
 
 const formatDate = (value?: Date | string | null) => {
   if (!value) {

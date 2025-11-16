@@ -59,3 +59,26 @@ export const getPublicStoreInfo = async () => {
     }
   );
 };
+
+/**
+ * Get footer-specific information (contact info for display)
+ */
+export const getFooterInfo = async () => {
+  const record = await db.query.storeSettings.findFirst({
+    columns: {
+      companyName: true,
+      email: true,
+      phone: true,
+      logoUrl: true,
+    },
+  });
+
+  return (
+    record ?? {
+      companyName: "S & P Soluciones Integrales",
+      email: null,
+      phone: null,
+      logoUrl: null,
+    }
+  );
+};

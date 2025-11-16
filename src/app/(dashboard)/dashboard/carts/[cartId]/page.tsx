@@ -33,23 +33,7 @@ import {
 import { parseIntSafety } from "@/lib/utils";
 import { useDeleteCart } from "@/services/carts/mutations/cart.mutation";
 import { useCart } from "@/services/carts/queries/cart.query";
-
-const formatCurrency = (value?: string | number | null) => {
-  if (value === null || value === undefined) {
-    return "-";
-  }
-
-  const numericValue = typeof value === "number" ? value : Number(value);
-  if (Number.isNaN(numericValue)) {
-    return "-";
-  }
-
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(numericValue);
-};
+import { formatCurrency } from "@/lib/currency";
 
 const formatDateTime = (value?: Date | string | null) => {
   if (!value) {
@@ -152,7 +136,8 @@ export default function CartDetailPage() {
               <Badge variant={status.variant}>{status.label}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Última actualización: {formatDateTime(cart.updatedAt as Date | string)}
+              Última actualización:{" "}
+              {formatDateTime(cart.updatedAt as Date | string)}
             </p>
           </div>
         </div>
@@ -247,7 +232,9 @@ export default function CartDetailPage() {
                 <p className="text-muted-foreground">Cliente</p>
                 {cart.user ? (
                   <div>
-                    <p className="font-medium">{cart.user.name ?? "Sin nombre"}</p>
+                    <p className="font-medium">
+                      {cart.user.name ?? "Sin nombre"}
+                    </p>
                     <p className="text-muted-foreground">{cart.user.email}</p>
                   </div>
                 ) : (
@@ -322,7 +309,11 @@ export default function CartDetailPage() {
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+            >
               Eliminar
             </Button>
           </DialogFooter>

@@ -1,11 +1,16 @@
 import { Icon } from "@iconify/react";
 import Link from "next/link";
+import { getFooterInfo } from "@/services/store-settings/actions/public-settings.actions";
 
-// export const sql = `--sql
-// SELECT firstName FROM dia.users WHERE id = 1;
-// `
+export const SiteFooter = async () => {
+  const settings = await getFooterInfo();
 
-export const SiteFooter = () => {
+  // Format phone number for links (remove spaces and special chars)
+  const phoneFormatted = settings.phone?.replace(/\s+/g, "") ?? "";
+  const whatsappLink = phoneFormatted
+    ? `https://api.whatsapp.com/send?phone=${phoneFormatted}&text=Hola,%20necesito%20información`
+    : "#";
+
   return (
     <footer className="bg-zinc-100 py-6">
       <div className="container">
@@ -20,29 +25,31 @@ export const SiteFooter = () => {
             <div className="space-y-7">
               <h3 className="font-semibold text-sm">Contacto</h3>
               <ul className="space-y-7 text-zinc-600 mb-3 text-sm">
-                <li>
-                  Telefono:
-                  <a href="tel:+51910675721">+51 910 675 721</a>
-                </li>
-                <li>
-                  Correo electrónico:
-                  <a href="mailto:mail@to.com">mail@to.com</a>
-                </li>
-                <li>
-                  Whatsapp:{" "}
-                  <a
-                    href="https://api.whatsapp.com/send?phone=51910675721&text=%F0%9F%98%AC%20hola%20como%20esta"
-                    target="_blank"
-                  >
-                    aquí
-                  </a>
-                </li>
+                {settings.phone && (
+                  <li>
+                    Teléfono:{" "}
+                    <a href={`tel:${phoneFormatted}`}>{settings.phone}</a>
+                  </li>
+                )}
+                {settings.email && (
+                  <li>
+                    Correo electrónico:{" "}
+                    <a href={`mailto:${settings.email}`}>{settings.email}</a>
+                  </li>
+                )}
+                {settings.phone && (
+                  <li>
+                    Whatsapp:{" "}
+                    <a
+                      href={whatsappLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      aquí
+                    </a>
+                  </li>
+                )}
               </ul>
-              <div className="flex items-center gap-2">
-                <Icon icon="logos:tiktok-icon" className="text-2xl" />
-                <Icon icon="skill-icons:instagram" className="text-2xl" />
-                <Icon icon="logos:facebook" className="text-2xl" />
-              </div>
             </div>
             <div className="space-y-7">
               <h3 className="font-semibold text-sm">Enlaces rápidos</h3>
@@ -53,9 +60,6 @@ export const SiteFooter = () => {
                 <li>
                   <Link href="/contact">Contacto</Link>
                 </li>
-                <li>
-                  <Link href="/faq">Preguntas frecuentes</Link>
-                </li>
               </ul>
             </div>
             <div className="space-y-7">
@@ -63,26 +67,21 @@ export const SiteFooter = () => {
               <ul className="space-y-7 text-zinc-600 mb-3 text-sm">
                 <li>Servicio al cliente</li>
                 <li>
-                  <Link href="/shipping">Envíos a todo el Perú</Link>
-                </li>
-                <li>
-                  <Link href="/returns">Devoluciones</Link>
+                  <Link href="/policies/shipping">Envíos a todo el Perú</Link>
                 </li>
               </ul>
             </div>
             <div className="space-y-7">
-              <h3 className="font-semibold text-sm">Terminos y condiciones</h3>
+              <h3 className="font-semibold text-sm">Términos y condiciones</h3>
               <ul className="space-y-7 text-zinc-600 mb-3 text-sm">
                 <li>
-                  <Link href="/">Política de reembolso</Link>
+                  <Link href="/policies/refund">Política de reembolso</Link>
                 </li>
-
                 <li>
-                  <Link href="/">Política de privacidad</Link>
+                  <Link href="/policies/privacy">Política de privacidad</Link>
                 </li>
-
                 <li>
-                  <Link href="/terms">Términos y condiciones</Link>
+                  <Link href="/policies/terms">Términos y condiciones</Link>
                 </li>
               </ul>
             </div>
@@ -96,15 +95,9 @@ export const SiteFooter = () => {
             </div>
           </div>
           <hr className="my-5" />
-          <div className="flex items-center gap-0.5 text-xs">
-            <div>&copy; {new Date().getFullYear()} Dia. desarrolla por </div>
-            <a
-              href="http://make.com.pe"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              make
-            </a>
+          <div className="text-xs text-zinc-600">
+            &copy; {new Date().getFullYear()} {settings.companyName}. Todos los
+            derechos reservados.
           </div>
         </div>
       </div>

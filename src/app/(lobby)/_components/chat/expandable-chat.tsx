@@ -51,6 +51,27 @@ const ExpandableChat: React.FC<ExpandableChatProps> = ({
 
   const toggleChat = () => setIsOpen(!isOpen);
 
+  // Close chat when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (chatRef.current && !chatRef.current.contains(event.target as Node)) {
+        const target = event.target as HTMLElement;
+        // Don't close if clicking the toggle button
+        if (!target.closest("button[data-chat-toggle]")) {
+          setIsOpen(false);
+        }
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
     <div
       className={cn(`fixed ${chatConfig.positions[position]} z-50`, className)}
@@ -59,7 +80,7 @@ const ExpandableChat: React.FC<ExpandableChatProps> = ({
       <div
         ref={chatRef}
         className={cn(
-          "flex flex-col bg-background border rounded-lg shadow-md overflow-hidden transition-all duration-250 ease-out absolute w-[90vw] h-[80vh] inset-auto",
+          "flex flex-col bg-background border rounded-lg shadow-md overflow-hidden transition-all duration-250 ease-out absolute w-[90vw] inset-auto",
           chatConfig.chatPositions[position],
           chatConfig.dimensions[size],
           isOpen ? chatConfig.states.open : chatConfig.states.closed,
@@ -128,6 +149,7 @@ const ExpandableChatToggle: React.FC<ExpandableChatToggleProps> = ({
   ...props
 }) => (
   <button
+    data-chat-toggle
     onClick={toggleChat}
     className={cn(
       "p-0 hover:bg-transparent flex items-center justify-center transition-all duration-300",

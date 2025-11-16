@@ -34,23 +34,7 @@ import { Separator } from "@/components/ui/separator";
 import { useDeleteOrder } from "@/services/orders/mutations/order.mutation";
 import { useOrder } from "@/services/orders/queries/order.query";
 import { parseIntSafety } from "@/lib/utils";
-
-const formatCurrency = (value?: string | number | null) => {
-  if (value === null || value === undefined) {
-    return "S/. 0.00";
-  }
-
-  const numericValue = typeof value === "number" ? value : Number(value);
-  if (Number.isNaN(numericValue)) {
-    return "S/. 0.00";
-  }
-
-  return new Intl.NumberFormat("es-PE", {
-    style: "currency",
-    currency: "PEN",
-    minimumFractionDigits: 2,
-  }).format(numericValue);
-};
+import { formatCurrency } from "@/lib/currency";
 
 const formatDateTime = (value?: Date | string | null) => {
   if (!value) {

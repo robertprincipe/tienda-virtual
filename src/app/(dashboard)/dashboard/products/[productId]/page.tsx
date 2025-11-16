@@ -26,23 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { parseIntSafety } from "@/lib/utils";
 import { useDeleteProduct } from "@/services/products/mutations/product.mutation";
 import { useProduct } from "@/services/products/queries/product.query";
-
-const formatCurrency = (value?: string | number | null) => {
-  if (value === null || value === undefined) {
-    return "-";
-  }
-
-  const numericValue = typeof value === "number" ? value : Number(value);
-  if (Number.isNaN(numericValue)) {
-    return "-";
-  }
-
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(numericValue);
-};
+import { formatCurrency } from "@/lib/currency";
 
 const formatDate = (value?: Date | string | null) => {
   if (!value) {

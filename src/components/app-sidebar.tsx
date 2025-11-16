@@ -23,6 +23,7 @@ import {
   ShoppingCart,
   Star,
   Ticket,
+  User2,
 } from "lucide-react";
 import AppLogo from "./app-logo";
 
@@ -56,6 +57,11 @@ const mainNavItems: NavItem[] = [
     title: "Carritos",
     href: "/dashboard/carts",
     icon: ShoppingCart,
+  },
+  {
+    title: "Usuarios",
+    href: "/dashboard/users",
+    icon: User2,
   },
   {
     title: "Reseñas",

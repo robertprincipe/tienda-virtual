@@ -109,6 +109,13 @@ async function loadCartForCheckout(cartId: number): Promise<{
         compareAtPrice: products.compareAtPrice,
         slug: products.slug,
         stock: products.stock,
+        primaryImage: sql<string | null>`(
+          select product_images.image_url
+          from product_images
+          where product_images.product_id = ${products.id}
+          order by product_images.sort_order asc
+          limit 1
+        )`.as("primaryImage"),
         categoryId: products.categoryId,
       },
     })
@@ -123,6 +130,7 @@ async function loadCartForCheckout(cartId: number): Promise<{
       product: {
         ...item.product,
         price: item.product.price,
+        primaryImage: item.product.primaryImage,
         compareAtPrice: item.product.compareAtPrice || null,
       },
     })),

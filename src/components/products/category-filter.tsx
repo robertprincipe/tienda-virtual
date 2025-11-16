@@ -88,25 +88,23 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
             if (hasChildren) {
               return (
                 <AccordionItem key={parent.id} value={`parent-${parent.id}`}>
-                  <AccordionTrigger className="py-2 hover:no-underline">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`category-${parent.id}`}
-                        checked={selectedCategories.includes(parent.id)}
-                        onCheckedChange={(checked) =>
-                          handleCategoryToggle(parent.id, checked as boolean)
-                        }
-                        onClick={(e) => e.stopPropagation()}
-                      />
+                  <div className="flex items-center gap-2 py-2 border-b">
+                    <Checkbox
+                      id={`category-${parent.id}`}
+                      checked={selectedCategories.includes(parent.id)}
+                      onCheckedChange={(checked) =>
+                        handleCategoryToggle(parent.id, checked as boolean)
+                      }
+                    />
+                    <AccordionTrigger className="flex-1 py-0 hover:no-underline justify-between">
                       <Label
                         htmlFor={`category-${parent.id}`}
                         className="text-sm font-normal cursor-pointer"
-                        onClick={(e) => e.stopPropagation()}
                       >
                         {parent.name}
                       </Label>
-                    </div>
-                  </AccordionTrigger>
+                    </AccordionTrigger>
+                  </div>
                   <AccordionContent>
                     <div className="ml-6 space-y-2 pt-2">
                       {children.map((child) => (

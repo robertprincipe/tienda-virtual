@@ -5,6 +5,7 @@ import { SiteFooter } from "./_layout/site-footer";
 import { PropsWithChildren } from "react";
 
 import { WhatsAppButton } from "./_components/whatsapp-button";
+import { CartInitializer } from "@/components/cart/cart-initializer";
 
 export default function LobbyLayout({ children }: PropsWithChildren) {
   return (
@@ -12,6 +13,8 @@ export default function LobbyLayout({ children }: PropsWithChildren) {
       <SiteHeader />
       {children}
       <SiteFooter />
+
+      <CartInitializer />
 
       <WhatsAppButton />
     </>

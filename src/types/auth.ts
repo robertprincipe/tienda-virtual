@@ -3,6 +3,7 @@ export interface SessionUser {
   email: string;
   name: string;
   roleId: number;
+  photoUrl?: string | null;
 }
 
 export interface SessionData {

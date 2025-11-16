@@ -32,6 +32,7 @@ const mapSessionUser = (record: UserRecord): SessionUser => ({
   id: record.id,
   email: record.email,
   roleId: record.roleId,
+  photoUrl: record.photoUrl,
   name:
     buildFullName(
       record.name,

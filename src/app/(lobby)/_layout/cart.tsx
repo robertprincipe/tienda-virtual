@@ -13,36 +13,11 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { QuantityInputBasic } from "./input-quantity";
 import Link from "next/link";
 import { useCartStore } from "@/hooks/stores/cart.store";
-import { CartItem } from "@/types/cart";
-import { parseIntSafety } from "@/lib/utils";
-
-// Datos inventados para placeholder
-const fakeData = {
-  result: {
-    cartItems: [
-      {
-        id: 1,
-        quantity: 2,
-        product: { name: "Otro producto", price: "50", compareAtPrice: "70" },
-      },
-      {
-        id: 2,
-        quantity: 1,
-        product: { name: "Otro producto", price: "80", compareAtPrice: "100" },
-      },
-    ],
-  },
-};
 
 export function Cart() {
-  const [open, setOpen, total] = useCartStore((state) => [
-    state.open,
-    state.setOpen,
-    state.total,
-  ]);
+  const { open, setOpen, items, loading, amount, total } = useCartStore();
 
-  const data = fakeData;
-  const isLoading = false;
+  const isLoading = loading;
 
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -50,19 +25,29 @@ export function Cart() {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-  }, [data?.result?.cartItems.length]);
+  }, [items.length]);
+
+  const totalAmount = amount();
+  const totalItems = total();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent className="sm:max-w-lg p-0 inset-y-2 right-2 rounded-xl w-[calc(100%-16px)] h-[calc(100%-16px)] overflow-hidden border shadow-2xs">
         <div className="flex flex-col h-full">
           <SheetHeader className="border-b p-6">
-            <SheetTitle>Carrito de compras</SheetTitle>
+            <SheetTitle>
+              Carrito de compras
+              {totalItems > 0 && (
+                <span className="ml-2 text-sm text-muted-foreground">
+                  ({totalItems} {totalItems === 1 ? "producto" : "productos"})
+                </span>
+              )}
+            </SheetTitle>
           </SheetHeader>
 
           <div
             className={`grow overflow-y-auto ${
-              data?.result.cartItems.length === 0
+              items.length === 0
                 ? "flex items-center justify-center gap-3 flex-col"
                 : ""
             }`}
@@ -77,37 +62,45 @@ export function Cart() {
               </div>
             ) : (
               <div className="divide-y px-6 w-full">
-                {!isLoading && (data?.result.cartItems.length ?? 0) === 0 ? (
+                {!isLoading && items.length === 0 ? (
                   <div className="flex items-center justify-center gap-3 flex-col">
                     <Icon
                       icon="material-symbols-light:shopping-basket"
                       className="text-6xl"
                     />
-                    <p>Tu carrito esta vacio</p>
-                    <button className="bg-zinc-950 text-white w-full rounded-md flex justify-center items-center gap-1 py-2 text-lg">
+                    <p>Tu carrito está vacío</p>
+                    <Link
+                      href="/products"
+                      onClick={() => setOpen(false)}
+                      className="bg-zinc-950 text-white w-full rounded-md flex justify-center items-center gap-1 py-2 text-lg hover:bg-zinc-800 transition-colors"
+                    >
                       <span>Empezar a comprar</span>
-                    </button>
+                    </Link>
                   </div>
                 ) : null}
 
-                {data?.result.cartItems.map((item) => (
+                {items.map((item) => (
                   <CartItemCard key={item.id} item={item} />
                 ))}
               </div>
             )}
           </div>
 
-          {(data?.result.cartItems.length ?? 0) > 0 ? (
-            <div className="mt-auto border-t bg-white py-4 px-6">
-              <div className="flex justify-between items-center mb-3 text-sm">
-                <span className="underline">Agregar una nota</span>
-                <p>Incluido IGV</p>
+          {items.length > 0 ? (
+            <div className="mt-auto border-t bg-white py-4 px-6 space-y-3">
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-medium">Subtotal:</span>
+                <p className="text-lg font-semibold">
+                  S/. {totalAmount.toFixed(2)}
+                </p>
               </div>
+              <p className="text-xs text-muted-foreground">IGV incluido</p>
               <Link
                 href="/checkout"
-                className="bg-zinc-950 text-white w-full rounded-md flex justify-center items-center gap-1 py-2 text-lg"
+                onClick={() => setOpen(false)}
+                className="bg-zinc-950 text-white w-full rounded-md flex justify-center items-center gap-1 py-2 text-lg hover:bg-zinc-800 transition-colors"
               >
-                <span>Pagar - S/. {total()}</span>
+                <span>Ir a pagar</span>
               </Link>
             </div>
           ) : null}
@@ -117,58 +110,106 @@ export function Cart() {
   );
 }
 
-export function CartItemCard({ item }: { item: CartItem }) {
-  // Placeholder sin lógica real
-  const isPending = false;
-
-  const [quantity, setQuantity] = React.useState(
-    item.quantity ? item.quantity : 1
-  );
-
-  const onIncrement = (q: number) => {
-    setQuantity(q);
+interface CartItemCardProps {
+  item: {
+    id: number;
+    productId: number;
+    quantity: number;
+    product: {
+      id: number;
+      name: string;
+      price: string;
+      compareAtPrice: string | null;
+      slug: string;
+      stock: number;
+    };
   };
+}
+
+export function CartItemCard({ item }: CartItemCardProps) {
+  const { updateQuantity, removeItem, loading } = useCartStore();
+  const [localQuantity, setLocalQuantity] = React.useState(item.quantity);
+
+  // Sincronizar cantidad local con la del store
+  React.useEffect(() => {
+    setLocalQuantity(item.quantity);
+  }, [item.quantity]);
+
+  const handleQuantityChange = async (newQuantity: number) => {
+    setLocalQuantity(newQuantity);
+
+    if (newQuantity === 0) {
+      await removeItem(item.productId);
+    } else {
+      await updateQuantity(item.productId, newQuantity);
+    }
+  };
+
+  const handleRemove = async () => {
+    await removeItem(item.productId);
+  };
+
+  const price = parseFloat(item.product.price || "0");
+  const comparePrice = item.product.compareAtPrice
+    ? parseFloat(item.product.compareAtPrice)
+    : null;
+  const itemTotal = price * localQuantity;
 
   return (
     <article
-      key={item.id}
       className={`grid grid-cols-4 gap-4 py-3 ${
-        quantity === 0 ? "animate-pulse" : ""
+        loading ? "opacity-50 pointer-events-none" : ""
       }`}
     >
-      <div>
-        <img src={""} alt="" className="h-full object-cover" />
-      </div>
+      <Link
+        href={`/products/${item.product.slug}`}
+        className="aspect-square bg-muted rounded-md overflow-hidden"
+      >
+        <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
+          Sin imagen
+        </div>
+      </Link>
       <div className="col-span-3 gap-2 grid grid-cols-3 md:grid-cols-4">
         <div className="col-span-2 md:col-span-3">
-          <h3 className="font-medium md:text-base text-sm line-clamp-2">
-            {item.product.name}
-          </h3>
+          <Link href={`/products/${item.product.slug}`}>
+            <h3 className="font-medium md:text-base text-sm line-clamp-2 hover:text-primary transition-colors">
+              {item.product.name}
+            </h3>
+          </Link>
 
-          <p className="text-sm font-medium text-zinc-500">{quantity} unidad</p>
-          <div className="flex items-center gap-2">
+          <p className="text-sm font-medium text-zinc-500 mt-1">
+            {localQuantity} {localQuantity === 1 ? "unidad" : "unidades"}
+          </p>
+          {item.product.stock < 5 && item.product.stock > 0 && (
+            <p className="text-xs text-orange-600 mt-1">
+              Solo quedan {item.product.stock} unidades
+            </p>
+          )}
+          <div className="flex items-center gap-2 mt-2">
             <QuantityInputBasic
-              quantity={quantity}
-              disabled={isPending}
-              onChange={onIncrement}
+              quantity={localQuantity}
+              disabled={loading}
+              onChange={handleQuantityChange}
             />
             <button
               type="button"
-              disabled={isPending}
-              className="cursor-pointer"
-              onClick={() => onIncrement(0)}
+              disabled={loading}
+              className="cursor-pointer hover:text-red-600 transition-colors"
+              onClick={handleRemove}
             >
-              <Icon icon="gg:trash" className="size-6 text-zinc-700" />
+              <Icon icon="gg:trash" className="size-6" />
             </button>
           </div>
         </div>
         <div className="flex flex-col items-end gap-1 py-2">
-          <p className="font-semibold text-red-600 text-lg">
-            {item.product.price}
-            S./ {(parseIntSafety(item.product.price) ?? 0) * quantity}
-          </p>
-          <p className="line-through font-medium decoration-2 text-zinc-600">
-            S./ {(parseIntSafety(item.product.compareAtPrice) ?? 0) * quantity}
+          <p className="font-semibold text-lg">S/. {itemTotal.toFixed(2)}</p>
+          {comparePrice && comparePrice > price && (
+            <p className="line-through font-medium decoration-2 text-zinc-600 text-sm">
+              S/. {(comparePrice * localQuantity).toFixed(2)}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            S/. {price.toFixed(2)} c/u
           </p>
         </div>
       </div>

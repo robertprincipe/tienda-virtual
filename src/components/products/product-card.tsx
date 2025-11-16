@@ -14,6 +14,7 @@ import type { ProductListItem } from "@/schemas/product.schema";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { ProductAddToCart } from "../cart/add-to-cart-button";
 
 interface ProductCardProps {
   product: ProductListItem;
@@ -159,14 +160,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
       </CardContent>
 
       <CardFooter className="p-4 pt-0">
-        <Button
-          className="w-full gap-2"
-          disabled={product.stock === 0}
-          size="sm"
-        >
-          <ShoppingCart className="h-4 w-4" />
-          Agregar al carrito
-        </Button>
+        <ProductAddToCart productId={product.id} stock={1} />
       </CardFooter>
     </Card>
   );

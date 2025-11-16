@@ -23,7 +23,8 @@ export const useRegisterMutation = () => {
       toast.success({
         text: data.message,
       });
-      router.replace("/dashboard");
+      // Los usuarios nuevos son customers (roleId = 3), van a /products
+      router.replace("/products");
       router.refresh();
     },
     onError: (error) => {
@@ -42,7 +43,15 @@ export const useLoginMutation = () => {
       toast.success({
         text: data.message,
       });
-      router.replace("/dashboard");
+
+      // Redirigir según el rol del usuario
+      // roleId 1 = Admin, 2 = Seller → /dashboard
+      // roleId 3 = Customer → /products
+      if (data.user.roleId === 1 || data.user.roleId === 2) {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/products");
+      }
       router.refresh();
     },
     onError: (error) => {

@@ -12,7 +12,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { ProductWithRelations } from "@/schemas/product.schema";
 import type { SessionUser } from "@/types/auth";
 import { ProductReviewForm } from "@/components/product-review-form";
@@ -30,12 +31,25 @@ interface ProductDetailClientProps {
   product: ProductWithRelations;
   user: SessionUser | null;
   hasReviewed: boolean;
+  reviews: Array<{
+    id: number;
+    rating: string;
+    title: string | null;
+    body: string | null;
+    createdAt: Date;
+    user: {
+      id: number;
+      name: string;
+      photoUrl: string | null;
+    } | null;
+  }>;
 }
 
 export default function ProductDetailClient({
   product,
   user,
   hasReviewed,
+  reviews,
 }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [showFloatingButton, setShowFloatingButton] = useState(false);
@@ -437,6 +451,69 @@ export default function ProductDetailClient({
       {user && !hasReviewed && (
         <div className="container mx-auto px-4 py-8">
           <ProductReviewForm productId={product.id} />
+        </div>
+      )}
+
+      {/* Reviews List Section */}
+      {reviews.length > 0 && (
+        <div className="container mx-auto px-4 py-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reseñas ({reviews.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="border-b last:border-b-0 pb-6 last:pb-0"
+                >
+                  <div className="flex items-start gap-4">
+                    <Avatar>
+                      <AvatarImage src={review.user?.photoUrl || undefined} />
+                      <AvatarFallback>
+                        {review.user?.name.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-semibold">
+                          {review.user?.name || "Usuario"}
+                        </span>
+                        <div className="flex items-center">
+                          {Array.from({ length: 5 }).map((_, index) => (
+                            <Star
+                              key={index}
+                              className={`h-4 w-4 ${
+                                index < parseFloat(review.rating)
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(review.createdAt).toLocaleDateString(
+                            "es-ES",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </span>
+                      </div>
+                      {review.title && (
+                        <h4 className="font-semibold mb-2">{review.title}</h4>
+                      )}
+                      {review.body && (
+                        <p className="text-muted-foreground">{review.body}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
       )}
     </>

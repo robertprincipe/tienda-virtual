@@ -1,12 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  Controller,
-  Resolver,
-  useFieldArray,
-  useForm,
-} from "react-hook-form";
+import { Controller, Resolver, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -53,7 +48,12 @@ interface OrderFormProps {
   defaultValues: OrderFormValues;
   onSubmit: (values: OrderFormValues) => void;
   users: Array<{ id: number; name: string | null; email: string | null }>;
-  products: Array<{ id: number; name: string; sku?: string | null; price?: string | null }>;
+  products: Array<{
+    id: number;
+    name: string;
+    sku?: string | null;
+    price?: string | null;
+  }>;
   isSubmitting?: boolean;
   submitLabel?: string;
 }
@@ -67,7 +67,9 @@ export function OrderForm({
   submitLabel = "Guardar pedido",
 }: OrderFormProps) {
   const form = useForm<OrderFormValues>({
-    resolver: zodResolver(orderFormSchema) as unknown as Resolver<OrderFormValues>,
+    resolver: zodResolver(
+      orderFormSchema
+    ) as unknown as Resolver<OrderFormValues>,
     defaultValues,
   });
 
@@ -82,11 +84,12 @@ export function OrderForm({
   const watchedShipping = form.watch("shipping");
 
   const totals = useMemo(() => {
-    const subtotal = watchedItems?.reduce((acc, item) => {
-      const quantity = item?.quantity ?? 0;
-      const price = item?.unitPrice ?? 0;
-      return acc + price * quantity;
-    }, 0) ?? 0;
+    const subtotal =
+      watchedItems?.reduce((acc, item) => {
+        const quantity = item?.quantity ?? 0;
+        const price = item?.unitPrice ?? 0;
+        return acc + price * quantity;
+      }, 0) ?? 0;
 
     const discount = watchedDiscount ?? 0;
     const tax = watchedTax ?? 0;
@@ -127,9 +130,8 @@ export function OrderForm({
     onSubmit(values);
   };
 
-  const numberInputHandler = (
-    field: { onChange: (value: number | undefined) => void }
-  ) =>
+  const numberInputHandler =
+    (field: { onChange: (value: number | undefined) => void }) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       field.onChange(
         event.target.value === "" ? undefined : Number(event.target.value)
@@ -159,11 +161,13 @@ export function OrderForm({
                     }
                   }}
                 >
-                  <SelectTrigger id="order-user" aria-invalid={fieldState.invalid}>
-                    <SelectValue placeholder="Carrito anónimo" />
+                  <SelectTrigger
+                    id="order-user"
+                    aria-invalid={fieldState.invalid}
+                  >
+                    <SelectValue placeholder="Carrito anónimo (asignar)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Pedido invitado</SelectItem>
                     {users.map((user) => (
                       <SelectItem key={user.id} value={String(user.id)}>
                         {user.name ?? "Sin nombre"}
@@ -176,7 +180,9 @@ export function OrderForm({
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -193,7 +199,9 @@ export function OrderForm({
                   placeholder="cliente@correo.com"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -207,7 +215,10 @@ export function OrderForm({
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="order-status">Estado</FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="order-status" aria-invalid={fieldState.invalid}>
+                  <SelectTrigger
+                    id="order-status"
+                    aria-invalid={fieldState.invalid}
+                  >
                     <SelectValue placeholder="Selecciona un estado" />
                   </SelectTrigger>
                   <SelectContent>
@@ -218,7 +229,9 @@ export function OrderForm({
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -234,7 +247,9 @@ export function OrderForm({
                   placeholder="PROMO10"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -404,7 +419,9 @@ export function OrderForm({
                   onChange={numberInputHandler(field)}
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -422,7 +439,9 @@ export function OrderForm({
                   onChange={numberInputHandler(field)}
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -440,7 +459,9 @@ export function OrderForm({
                   onChange={numberInputHandler(field)}
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -508,14 +529,18 @@ export function OrderForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="order-fullname">Nombre completo</FieldLabel>
+                <FieldLabel htmlFor="order-fullname">
+                  Nombre completo
+                </FieldLabel>
                 <Input
                   {...field}
                   id="order-fullname"
                   placeholder="Juan Pérez"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -531,7 +556,9 @@ export function OrderForm({
                   placeholder="+51 999 999 999"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -549,7 +576,9 @@ export function OrderForm({
                   placeholder="Av. Siempre Viva 742"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -558,14 +587,18 @@ export function OrderForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="order-line2">Departamento (opcional)</FieldLabel>
+                <FieldLabel htmlFor="order-line2">
+                  Departamento (opcional)
+                </FieldLabel>
                 <Input
                   {...field}
                   id="order-line2"
                   placeholder="Depto 101"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -583,7 +616,9 @@ export function OrderForm({
                   placeholder="Lima"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -599,7 +634,9 @@ export function OrderForm({
                   placeholder="Lima"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -615,7 +652,9 @@ export function OrderForm({
                   placeholder="15000"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -654,7 +693,9 @@ export function OrderForm({
                   placeholder="Entrega express"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -670,7 +711,9 @@ export function OrderForm({
                   placeholder="DHL"
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -680,7 +723,9 @@ export function OrderForm({
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="order-tracking">Número de seguimiento</FieldLabel>
+              <FieldLabel htmlFor="order-tracking">
+                Número de seguimiento
+              </FieldLabel>
               <Input
                 {...field}
                 id="order-tracking"
@@ -715,7 +760,9 @@ export function OrderForm({
                   }
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -738,7 +785,9 @@ export function OrderForm({
                   }
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -763,7 +812,9 @@ export function OrderForm({
                   }
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />
@@ -786,7 +837,9 @@ export function OrderForm({
                   }
                   aria-invalid={fieldState.invalid}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
               </Field>
             )}
           />

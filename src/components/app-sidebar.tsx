@@ -21,6 +21,7 @@ import {
   PackageCheck,
   Settings,
   ShoppingCart,
+  Star,
   Ticket,
 } from "lucide-react";
 import AppLogo from "./app-logo";
@@ -55,6 +56,11 @@ const mainNavItems: NavItem[] = [
     title: "Carritos",
     href: "/dashboard/carts",
     icon: ShoppingCart,
+  },
+  {
+    title: "Reseñas",
+    href: "/dashboard/reviews",
+    icon: Star,
   },
 ];
 

@@ -1,12 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  Controller,
-  Resolver,
-  useFieldArray,
-  useForm,
-} from "react-hook-form";
+import { Controller, Resolver, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -124,10 +119,9 @@ export function CartForm({
                     id="cart-user"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue placeholder="Selecciona un cliente" />
+                    <SelectValue placeholder="Sin cliente." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Carrito anónimo</SelectItem>
                     {users.map((user) => (
                       <SelectItem key={user.id} value={String(user.id)}>
                         {user.name ?? "Sin nombre"}
@@ -165,8 +159,8 @@ export function CartForm({
                         {status === "active"
                           ? "Activo"
                           : status === "converted"
-                            ? "Convertido"
-                            : "Abandonado"}
+                          ? "Convertido"
+                          : "Abandonado"}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -198,13 +192,10 @@ export function CartForm({
                 }
                 aria-invalid={fieldState.invalid}
               />
-              {fieldState.invalid && (
-                <FieldError errors={[fieldState.error]} />
-              )}
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
-
       </FieldGroup>
 
       <FieldGroup>

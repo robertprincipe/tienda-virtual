@@ -1,28 +1,22 @@
-export interface ProductReview {
-  id: number;
-  product_id: number;
-  user_id: number | null;
-  rating: number;
-  title: string | null;
-  body: string | null;
-  is_approved: boolean;
+import type {
+  ReviewListItem,
+  ReviewWithRelations,
+} from "@/schemas/product-review.schema";
 
-  // Relations
-  user?: {
-    id: number;
-    name: string;
-    email: string;
+export interface PaginatedReviews {
+  message: string;
+  result: {
+    data: ReviewListItem[];
+    count: number;
+    pageCount: number;
+    total: number;
+    nextPage: number | null;
+    currentPage: number;
+    minMax: {
+      min: number;
+      max: number;
+    };
   };
-
-  product?: {
-    id: number;
-    name: string;
-    slug: string;
-    sku: string;
-  };
-
-  // Timestamps
-  created_at: string | null;
-  updated_at: string | null;
-  deleted_at: string | null;
 }
+
+export type ReviewDetail = ReviewWithRelations;

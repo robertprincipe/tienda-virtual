@@ -62,6 +62,7 @@ export default function EditCategory({ category }: EditCategoryProps) {
 
   const { data: categories } = useCategories({
     notInIds: [category.id],
+    onlyParents: true,
   });
 
   const [imageFiles, setImageFiles] = useState<File[]>();

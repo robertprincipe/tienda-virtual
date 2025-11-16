@@ -315,26 +315,32 @@ export const deleteProduct = async (id: number) => {
  * Get featured products (active products with images, limited to specified count)
  * @param limit - Maximum number of products to return (default: 8)
  */
-export const getFeaturedProducts = async (limit = 8) => {
+export const getFeaturedProducts = async (
+  limit = 8
+): Promise<ProductListItem[]> => {
+  const productColumns = getTableColumns(products);
+  const categoryColumns = {
+    id: categories.id,
+    name: categories.name,
+    slug: categories.slug,
+  };
+
+  const primaryImage = sql<string | null>`(
+    select product_images.image_url
+    from product_images
+    where product_images.product_id = ${products.id}
+    order by product_images.sort_order asc
+    limit 1
+  )`.as("primaryImage");
+
   const items = await db
     .select({
-      id: products.id,
-      name: products.name,
-      slug: products.slug,
-      price: products.price,
-      compareAtPrice: products.compareAtPrice,
-      shortDesc: products.shortDesc,
-      description: products.description,
-      stock: products.stock,
-      primaryImage: sql<string | null>`(
-        select product_images.image_url
-        from product_images
-        where product_images.product_id = ${products.id}
-        order by product_images.sort_order asc
-        limit 1
-      )`.as("primaryImage"),
+      ...productColumns,
+      category: categoryColumns,
+      primaryImage,
     })
     .from(products)
+    .leftJoin(categories, eq(categories.id, products.categoryId))
     .where(eq(products.status, "active"))
     .orderBy(desc(products.createdAt))
     .limit(limit);

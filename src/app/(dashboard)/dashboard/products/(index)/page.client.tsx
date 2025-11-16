@@ -156,8 +156,8 @@ export default function ProductsIndex({ productsPromise }: ProductsIndexProps) {
           <DialogHeader>
             <DialogTitle>¿Eliminar producto?</DialogTitle>
             <DialogDescription>
-              Esta acción eliminará "{selectedProduct?.name}" y no se podrá
-              revertir.
+              Esta acción eliminará &quot;{selectedProduct?.name}&quot; y no se
+              podrá revertir.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

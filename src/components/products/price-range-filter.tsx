@@ -45,7 +45,7 @@ export function PriceRangeFilter({
     }
 
     params.set("page", "1");
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   const handleReset = () => {
@@ -54,7 +54,7 @@ export function PriceRangeFilter({
     params.delete("maxPrice");
     params.set("page", "1");
     setRange([min, max]);
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   return (

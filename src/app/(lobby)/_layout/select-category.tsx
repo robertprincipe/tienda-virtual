@@ -17,7 +17,9 @@ export default function SelectCategory({
   value: string;
   onValueChange: (value: string) => void;
 }) {
-  const { data } = useCategories();
+  const { data } = useCategories({
+    onlyParents: true,
+  });
 
   return (
     <Select value={value} onValueChange={onValueChange}>

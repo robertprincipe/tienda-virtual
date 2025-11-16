@@ -1,7 +1,6 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,10 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { ProductListItem } from "@/schemas/product.schema";
-import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ProductAddToCart } from "../cart/add-to-cart-button";
+import { ProductCardAddToCart } from "../cart/add-to-cart-button";
 
 interface ProductCardProps {
   product: ProductListItem;
@@ -33,7 +31,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
 
   if (view === "list") {
     return (
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow py-0">
         <div className="flex flex-col sm:flex-row">
           <Link
             href={`/products/${product.slug}`}
@@ -59,7 +57,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
             )}
           </Link>
 
-          <div className="flex-1 flex flex-col p-4">
+          <div className="flex-1 flex flex-col p-2">
             <div className="flex-1">
               <Link href={`/products/${product.slug}`}>
                 <CardTitle className="text-lg hover:text-primary transition-colors line-clamp-2">
@@ -67,7 +65,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
                 </CardTitle>
               </Link>
               {product.category && (
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground mt-1 font-semibold">
                   {product.category.name}
                 </p>
               )}
@@ -82,24 +80,24 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-primary">
-                    ${price.toFixed(2)}
+                    S/. {price.toFixed(2)}
                   </span>
                   {comparePrice && comparePrice > price && (
                     <span className="text-sm text-muted-foreground line-through">
-                      ${comparePrice.toFixed(2)}
+                      S/. {comparePrice.toFixed(2)}
                     </span>
                   )}
                 </div>
               </div>
 
-              <Button
-                size="lg"
-                disabled={product.stock === 0}
-                className="gap-2"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                Agregar
-              </Button>
+              <div>
+                <ProductCardAddToCart
+                  direction="vertical"
+                  productId={product.id}
+                  stock={product.stock ?? 0}
+                  size="sm"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -108,7 +106,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
   }
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow group py-0 gap-2">
       <Link
         href={`/products/${product.slug}`}
         className="relative aspect-square bg-muted block"
@@ -133,7 +131,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         )}
       </Link>
 
-      <CardHeader className="p-4">
+      <CardHeader className="p-2">
         {product.category && (
           <p className="text-xs text-muted-foreground uppercase tracking-wide">
             {product.category.name}
@@ -146,21 +144,25 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         </Link>
       </CardHeader>
 
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-2 pt-0">
         <div className="flex items-baseline gap-2">
           <span className="text-xl font-bold text-primary">
-            ${price.toFixed(2)}
+            S/. {price.toFixed(2)}
           </span>
           {comparePrice && comparePrice > price && (
             <span className="text-sm text-muted-foreground line-through">
-              ${comparePrice.toFixed(2)}
+              S/. {comparePrice.toFixed(2)}
             </span>
           )}
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
-        <ProductAddToCart productId={product.id} stock={1} />
+      <CardFooter className="p-2 pt-0">
+        <ProductCardAddToCart
+          productId={product.id}
+          stock={product.stock ?? 0}
+          size="md"
+        />
       </CardFooter>
     </Card>
   );

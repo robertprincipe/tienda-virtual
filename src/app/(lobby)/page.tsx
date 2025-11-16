@@ -1,6 +1,7 @@
 import { CategoryCard } from "@/components/cards/category-card";
-import { ProductCard } from "@/components/cards/product-card";
+
 import { TestimonialCard } from "@/components/cards/testimonial-card";
+import { ProductCard } from "@/components/products/product-card";
 import { ProductCarousel } from "@/components/products/product-carousel";
 import { getFeaturedCategories } from "@/services/categories/actions/category.actions";
 import { getFeaturedProducts } from "@/services/products/actions/product.actions";
@@ -17,15 +18,7 @@ export default async function Index() {
   ]);
 
   // Transform products for display
-  const productsForCarousel = featuredProducts.map((product) => ({
-    id: product.id,
-    slug: product.slug,
-    name: product.name,
-    price: `S/. ${(parseFloat(product.price) / 100).toFixed(2)}`,
-    primaryImage: product.primaryImage,
-    shortDesc: product.shortDesc,
-    description: product.description,
-  }));
+  const productsForCarousel = featuredProducts;
 
   return (
     <div className="min-h-screen bg-[#FDFCF9] font-body text-[#1a1a1a]">
@@ -123,24 +116,7 @@ export default async function Index() {
           {featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
               {featuredProducts.slice(0, 4).map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  slug={product.slug}
-                  image={
-                    product.primaryImage ||
-                    "https://images.unsplash.com/photo-1579722820308-d74e571900a9?q=80&w=800"
-                  }
-                  name={product.name}
-                  price={`S/. ${(parseFloat(product.price) / 100).toFixed(2)}`}
-                  rating={5}
-                  reviews={0}
-                  description={
-                    product.shortDesc ||
-                    product.description ||
-                    "Producto orgánico de calidad premium."
-                  }
-                />
+                <ProductCard key={product.id} product={product} view="grid" />
               ))}
             </div>
           ) : (

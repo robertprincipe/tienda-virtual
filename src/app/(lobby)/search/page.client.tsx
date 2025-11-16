@@ -52,14 +52,13 @@ export default function SearchPageClient({
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", value);
     params.delete("page"); // Reset to page 1 when sorting
-    router.push(`/search?${params.toString()}`);
+    router.push(`/search?${params.toString()}`, { scroll: false });
   };
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
-    router.push(`/search?${params.toString()}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    router.push(`/search?${params.toString()}`, { scroll: false });
   };
 
   const calculateDiscount = (price: string, comparePrice: string | null) => {
@@ -185,11 +184,11 @@ export default function SearchPageClient({
                       )}
                       <div className="flex items-center gap-2">
                         <span className="text-lg font-bold text-primary">
-                          ${parseFloat(product.price).toFixed(2)}
+                          S/. {parseFloat(product.price).toFixed(2)}
                         </span>
                         {product.compareAtPrice && discount && (
                           <span className="text-sm text-muted-foreground line-through">
-                            ${parseFloat(product.compareAtPrice).toFixed(2)}
+                            S/. {parseFloat(product.compareAtPrice).toFixed(2)}
                           </span>
                         )}
                       </div>
@@ -245,11 +244,11 @@ export default function SearchPageClient({
                       )}
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl font-bold text-primary">
-                          ${parseFloat(product.price).toFixed(2)}
+                          S/. {parseFloat(product.price).toFixed(2)}
                         </span>
                         {product.compareAtPrice && discount && (
                           <span className="text-sm text-muted-foreground line-through">
-                            ${parseFloat(product.compareAtPrice).toFixed(2)}
+                            S/. {parseFloat(product.compareAtPrice).toFixed(2)}
                           </span>
                         )}
                       </div>

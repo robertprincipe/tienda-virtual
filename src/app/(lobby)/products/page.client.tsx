@@ -68,7 +68,7 @@ export default function ProductsClient({
     }
 
     params.set("page", "1");
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   const handleSortChange = (value: string) => {
@@ -81,13 +81,13 @@ export default function ProductsClient({
     }
 
     params.set("page", "1");
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   const currentSort = searchParams.get("sort") || "default";

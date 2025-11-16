@@ -19,7 +19,7 @@ export type SelectCategory = CategorySelectSchema & CategoryAggregation;
 
 export const panginatedCategoriesSchema = z.object({
   page: z.coerce.number().default(1),
-  per_page: z.coerce.number().default(2),
+  per_page: z.coerce.number().default(10),
   sort: z.string().optional(),
   name: z.string().optional(),
 });

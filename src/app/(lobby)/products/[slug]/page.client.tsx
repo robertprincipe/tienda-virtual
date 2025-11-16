@@ -26,6 +26,7 @@ import {
   Award,
   Package,
 } from "lucide-react";
+import { useCartStore } from "@/hooks/stores/cart.store";
 
 interface ProductDetailClientProps {
   product: ProductWithRelations;
@@ -51,6 +52,7 @@ export default function ProductDetailClient({
   hasReviewed,
   reviews,
 }: ProductDetailClientProps) {
+  const { addItem, loading } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [showFloatingButton, setShowFloatingButton] = useState(false);
 
@@ -70,6 +72,13 @@ export default function ProductDetailClient({
     const newQuantity = quantity + delta;
     if (newQuantity >= 1 && newQuantity <= (product.stock ?? 0)) {
       setQuantity(newQuantity);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    const success = await addItem(product.id, quantity);
+    if (success) {
+      setQuantity(1);
     }
   };
 
@@ -165,12 +174,6 @@ export default function ProductDetailClient({
           <div className="flex flex-col space-y-6">
             {/* Header Section */}
             <div>
-              {/* Badge Guarantee */}
-              <div className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full inline-flex items-center gap-2 text-sm font-semibold mb-4">
-                <Award className="h-4 w-4" />
-                30-DÍAS GARANTÍA DE DEVOLUCIÓN
-              </div>
-
               {/* Rating & Social Proof */}
               <div className="flex items-center gap-2 mb-2">
                 <div className="flex items-center">
@@ -211,12 +214,12 @@ export default function ProductDetailClient({
             {/* Price Section */}
             <div className="flex items-baseline gap-3">
               <span className="text-4xl md:text-5xl font-bold text-primary">
-                ${price.toFixed(2)}
+                S/. {price.toFixed(2)}
               </span>
               {comparePrice && comparePrice > price && (
                 <>
                   <span className="text-2xl text-muted-foreground line-through">
-                    ${comparePrice.toFixed(2)}
+                    S/. {comparePrice.toFixed(2)}
                   </span>
                   <Badge className="bg-green-600 text-white text-base px-3 py-1">
                     AHORRA {discount}%
@@ -260,7 +263,7 @@ export default function ProductDetailClient({
                   <div>
                     <p className="font-semibold text-sm">Garantizado</p>
                     <p className="text-xs text-muted-foreground">
-                      30 días devolución
+                      Satisfacción garantizada.
                     </p>
                   </div>
                 </div>
@@ -315,11 +318,13 @@ export default function ProductDetailClient({
                 </div>
 
                 <Button
+                  onClick={handleAddToCart}
+                  disabled={loading}
                   size="lg"
                   className="w-full gap-3 h-14 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
                 >
                   <ShoppingCart className="h-6 w-6" />
-                  Agregar al carrito
+                  {loading ? "Agregando..." : "Agregar al carrito"}
                 </Button>
               </div>
             )}
@@ -409,7 +414,7 @@ export default function ProductDetailClient({
                 <div className="min-w-0">
                   <h3 className="font-bold text-sm truncate">{product.name}</h3>
                   <p className="text-lg font-bold text-primary">
-                    ${price.toFixed(2)}
+                    S/. {price.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -437,9 +442,16 @@ export default function ProductDetailClient({
                   </Button>
                 </div>
 
-                <Button size="lg" className="gap-2 shadow-lg">
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={loading}
+                  size="lg"
+                  className="gap-2 shadow-lg"
+                >
                   <ShoppingCart className="h-5 w-5" />
-                  <span className="hidden sm:inline">Agregar</span>
+                  <span className="hidden sm:inline">
+                    {loading ? "Agregando..." : "Agregar"}
+                  </span>
                 </Button>
               </div>
             </div>
@@ -493,7 +505,7 @@ export default function ProductDetailClient({
                         </div>
                         <span className="text-sm text-muted-foreground">
                           {new Date(review.createdAt).toLocaleDateString(
-                            "es-ES",
+                            "es-PE",
                             {
                               year: "numeric",
                               month: "long",

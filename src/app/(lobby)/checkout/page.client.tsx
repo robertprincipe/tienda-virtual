@@ -121,6 +121,9 @@ export default function CheckoutClient({ user }: Props) {
       const result = await placeOrder(data, cartId);
 
       if (result.success && result.publicId) {
+        // Sincronizar el store del carrito para vaciarlo
+        await useCartStore.getState().syncCart();
+
         // Redirigir a la página de tracking
         router.push(`/order/${result.publicId}`);
       } else {
@@ -294,36 +297,6 @@ export default function CheckoutClient({ user }: Props) {
                         />
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="postalCode"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Código Postal (Opcional)</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="countryCode"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>País</FormLabel>
-                              <FormControl>
-                                <Input {...field} maxLength={2} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
                       <FormField
                         control={form.control}
                         name="phone"
@@ -414,7 +387,7 @@ export default function CheckoutClient({ user }: Props) {
                       </div>
                       <div className="text-right">
                         <p className="font-medium">
-                          $
+                          S/.{" "}
                           {(
                             parseFloat(item.product.price) * item.quantity
                           ).toFixed(2)}
@@ -470,7 +443,7 @@ export default function CheckoutClient({ user }: Props) {
                         {appliedCoupon.couponCode}
                       </Badge>
                       <p className="text-sm text-green-700 dark:text-green-300">
-                        -${appliedCoupon.discount.toFixed(2)} de descuento
+                        -S/. {appliedCoupon.discount.toFixed(2)} de descuento
                       </p>
                     </div>
                     <Button
@@ -495,26 +468,26 @@ export default function CheckoutClient({ user }: Props) {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${displaySubtotal.toFixed(2)}</span>
+                    <span>S/. {displaySubtotal.toFixed(2)}</span>
                   </div>
                   {displayDiscount > 0 && (
                     <div className="flex justify-between text-green-600 dark:text-green-400">
                       <span>Descuento</span>
-                      <span>-${displayDiscount.toFixed(2)}</span>
+                      <span>-S/. {displayDiscount.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span>Envío</span>
-                    <span>${displayShipping.toFixed(2)}</span>
+                    <span>S/. {displayShipping.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Impuestos</span>
-                    <span>${displayTax.toFixed(2)}</span>
+                    <span>S/. {displayTax.toFixed(2)}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>${displayTotal.toFixed(2)}</span>
+                    <span>S/. {displayTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </CardContent>

@@ -5,7 +5,10 @@ import {
   getCategory,
 } from "../actions/category.actions";
 
-export const useCategories = (filters?: { notInIds: number[] }) =>
+export const useCategories = (filters?: {
+  notInIds?: number[];
+  onlyParents?: boolean;
+}) =>
   useQuery({
     queryKey: ["categories"],
     queryFn: async () => await getCategories(filters),

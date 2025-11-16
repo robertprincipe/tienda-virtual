@@ -41,7 +41,7 @@ const formatDate = (value?: Date | string | null) => {
     return "-";
   }
 
-  return date.toLocaleDateString("es-ES", {
+  return date.toLocaleDateString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -90,7 +90,9 @@ export const createColumns = (
           >
             {product.name}
           </Link>
-          <div className="text-sm text-muted-foreground">SKU: {product.sku}</div>
+          <div className="text-sm text-muted-foreground">
+            SKU: {product.sku}
+          </div>
         </div>
       );
     },
@@ -123,7 +125,9 @@ export const createColumns = (
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <span className="text-sm">{formatCurrency(row.original.price)}</span>,
+    cell: ({ row }) => (
+      <span className="text-sm">{formatCurrency(row.original.price)}</span>
+    ),
   },
   {
     accessorKey: "stock",
@@ -147,14 +151,14 @@ export const createColumns = (
         status === "active"
           ? "default"
           : status === "draft"
-            ? "secondary"
-            : "outline";
+          ? "secondary"
+          : "outline";
       const label =
         status === "active"
           ? "Activo"
           : status === "draft"
-            ? "Borrador"
-            : "Archivado";
+          ? "Borrador"
+          : "Archivado";
 
       return <Badge variant={variant}>{label}</Badge>;
     },

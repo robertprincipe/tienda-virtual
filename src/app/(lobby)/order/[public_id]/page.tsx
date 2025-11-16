@@ -94,7 +94,7 @@ export default async function OrderTrackingPage(props: Props) {
             <div className="text-sm text-muted-foreground">
               <Calendar className="w-4 h-4 inline mr-1" />
               Creada:{" "}
-              {new Date(order.placedAt).toLocaleDateString("es-ES", {
+              {new Date(order.placedAt).toLocaleDateString("es-PE", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -199,9 +199,9 @@ export default async function OrderTrackingPage(props: Props) {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">${item.unitPrice}</p>
+                  <p className="font-medium">S/. {item.unitPrice}</p>
                   <p className="text-sm text-muted-foreground">
-                    Subtotal: $
+                    Subtotal: S/.{" "}
                     {(
                       parseFloat(item.unitPrice) * parseFloat(item.quantity)
                     ).toFixed(2)}
@@ -222,28 +222,28 @@ export default async function OrderTrackingPage(props: Props) {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${order.subtotal}</span>
+              <span>S/. {order.subtotal}</span>
             </div>
             {parseFloat(order.discount) > 0 && (
               <div className="flex justify-between text-green-600 dark:text-green-400">
                 <span>
                   Descuento {order.couponCode && `(${order.couponCode})`}
                 </span>
-                <span>-${order.discount}</span>
+                <span>-S/. {order.discount}</span>
               </div>
             )}
             <div className="flex justify-between">
               <span>Envío</span>
-              <span>${order.shipping}</span>
+              <span>S/. {order.shipping}</span>
             </div>
             <div className="flex justify-between">
               <span>Impuestos</span>
-              <span>${order.tax}</span>
+              <span>S/. {order.tax}</span>
             </div>
             <Separator />
             <div className="flex justify-between text-lg font-bold">
               <span>Total</span>
-              <span>${order.total}</span>
+              <span>S/. {order.total}</span>
             </div>
           </div>
         </CardContent>

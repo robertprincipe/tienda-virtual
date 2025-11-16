@@ -16,12 +16,12 @@ import type { CartListItem } from "@/schemas/cart.schema";
 
 const formatCurrency = (value?: string | null) => {
   if (!value) {
-    return "$0.00";
+    return "S/.0.00";
   }
 
   const numericValue = Number(value);
   if (Number.isNaN(numericValue)) {
-    return "$0.00";
+    return "S/.0.00";
   }
 
   return new Intl.NumberFormat("es-MX", {
@@ -41,7 +41,7 @@ const formatDate = (value?: Date | string | null) => {
     return "-";
   }
 
-  return date.toLocaleDateString("es-ES", {
+  return date.toLocaleDateString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -103,7 +103,9 @@ export const createCartColumns = (
 
       return (
         <div className="flex flex-col">
-          <span className="text-sm font-medium">{user.name ?? "Sin nombre"}</span>
+          <span className="text-sm font-medium">
+            {user.name ?? "Sin nombre"}
+          </span>
           <span className="text-xs text-muted-foreground">{user.email}</span>
         </div>
       );

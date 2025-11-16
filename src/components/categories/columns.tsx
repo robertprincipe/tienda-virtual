@@ -128,7 +128,7 @@ export const createColumns = (
       const date = new Date(row.original.createdAt || "");
       return (
         <span className="text-sm">
-          {date.toLocaleDateString("es-ES", {
+          {date.toLocaleDateString("es-PE", {
             year: "numeric",
             month: "short",
             day: "numeric",

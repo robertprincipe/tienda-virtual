@@ -31,7 +31,7 @@ export function AvailabilityFilter() {
     }
 
     params.set("page", "1");
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const inStockValue = searchParams.get("inStock");

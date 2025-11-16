@@ -24,7 +24,7 @@ const formatDate = (value?: Date | string | null) => {
     return "-";
   }
 
-  return date.toLocaleDateString("es-ES", {
+  return date.toLocaleDateString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -40,7 +40,11 @@ export const createReviewColumns = (
     cell: ({ row }) => {
       const product = row.original.product;
       if (!product) {
-        return <span className="text-sm text-muted-foreground">Producto eliminado</span>;
+        return (
+          <span className="text-sm text-muted-foreground">
+            Producto eliminado
+          </span>
+        );
       }
 
       return (
@@ -64,7 +68,9 @@ export const createReviewColumns = (
 
       return (
         <div className="flex flex-col">
-          <span className="text-sm font-medium">{user.name ?? "Sin nombre"}</span>
+          <span className="text-sm font-medium">
+            {user.name ?? "Sin nombre"}
+          </span>
           <span className="text-xs text-muted-foreground">{user.email}</span>
         </div>
       );
@@ -82,7 +88,9 @@ export const createReviewColumns = (
       </Button>
     ),
     cell: ({ row }) => (
-      <span className="text-sm font-semibold">{Number(row.original.rating).toFixed(1)}</span>
+      <span className="text-sm font-semibold">
+        {Number(row.original.rating).toFixed(1)}
+      </span>
     ),
   },
   {

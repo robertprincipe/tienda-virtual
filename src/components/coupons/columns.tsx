@@ -41,7 +41,7 @@ const formatDate = (value?: Date | string | null) => {
     return "-";
   }
 
-  return date.toLocaleDateString("es-ES", {
+  return date.toLocaleDateString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -103,7 +103,9 @@ export const createColumns = (
     header: "Subtotal mínimo",
     cell: ({ row }) => (
       <span className="text-sm text-muted-foreground">
-        {row.original.minSubtotal ? formatCurrency(row.original.minSubtotal) : "-"}
+        {row.original.minSubtotal
+          ? formatCurrency(row.original.minSubtotal)
+          : "-"}
       </span>
     ),
   },
@@ -121,9 +123,13 @@ export const createColumns = (
     header: "Vigencia",
     cell: ({ row }) => (
       <div className="text-xs text-muted-foreground">
-        {row.original.startsAt ? formatDate(row.original.startsAt) : "Sin inicio"}
+        {row.original.startsAt
+          ? formatDate(row.original.startsAt)
+          : "Sin inicio"}
         <br />
-        {row.original.endsAt ? formatDate(row.original.endsAt) : "Sin vencimiento"}
+        {row.original.endsAt
+          ? formatDate(row.original.endsAt)
+          : "Sin vencimiento"}
       </div>
     ),
   },

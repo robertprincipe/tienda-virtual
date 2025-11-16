@@ -83,7 +83,7 @@ function CategoryDetailClient({
     }
 
     params.set("page", "1");
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const currentSort = searchParams.get("sort") || "default";
@@ -99,14 +99,13 @@ function CategoryDetailClient({
     }
 
     params.set("page", "1");
-    router.push(`?${params.toString()}`);
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.push(`?${params.toString()}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   return (

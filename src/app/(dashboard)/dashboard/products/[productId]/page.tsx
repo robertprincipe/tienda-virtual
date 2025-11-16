@@ -54,7 +54,7 @@ const formatDate = (value?: Date | string | null) => {
     return "-";
   }
 
-  return date.toLocaleDateString("es-ES", {
+  return date.toLocaleDateString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -81,8 +81,8 @@ export default function ProductDetailPage() {
     product.status === "active"
       ? "Activo"
       : product.status === "draft"
-        ? "Borrador"
-        : "Archivado";
+      ? "Borrador"
+      : "Archivado";
 
   return (
     <div className="flex h-full flex-1 flex-col gap-6 p-6">
@@ -95,14 +95,16 @@ export default function ProductDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
+              <h1 className="text-3xl font-bold tracking-tight">
+                {product.name}
+              </h1>
               <Badge
                 variant={
                   product.status === "active"
                     ? "default"
                     : product.status === "draft"
-                      ? "secondary"
-                      : "outline"
+                    ? "secondary"
+                    : "outline"
                 }
               >
                 {statusLabel}
@@ -186,7 +188,8 @@ export default function ProductDetailPage() {
                   Dimensiones (L x A x H cm)
                 </p>
                 <p>
-                  {product.length ?? "-"} x {product.width ?? "-"} x {product.height ?? "-"}
+                  {product.length ?? "-"} x {product.width ?? "-"} x{" "}
+                  {product.height ?? "-"}
                 </p>
               </div>
               <div>
@@ -240,7 +243,10 @@ export default function ProductDetailPage() {
           {product.images && product.images.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {product.images.map((image) => (
-                <div key={image.id} className="overflow-hidden rounded-lg border">
+                <div
+                  key={image.id}
+                  className="overflow-hidden rounded-lg border"
+                >
                   <img
                     src={image.imageUrl}
                     alt={image.altText || product.name}

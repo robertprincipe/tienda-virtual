@@ -54,14 +54,14 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
     }
 
     params.set("page", "1");
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   const clearFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("categoryId");
     params.set("page", "1");
-    router.push(`/products?${params.toString()}`);
+    router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
   return (
@@ -71,7 +71,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
         {selectedCategories.length > 0 && (
           <Button
             onClick={clearFilters}
-            variant="ghost"
+            variant="outline"
             className="h-auto p-0 text-xs"
           >
             Limpiar
@@ -79,7 +79,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
         )}
       </div>
 
-      <ScrollArea className="h-[400px] pr-4">
+      <ScrollArea className="h-[400px]">
         <Accordion type="multiple" className="w-full">
           {parentCategories.map((parent) => {
             const children = childCategoriesMap.get(parent.id) || [];

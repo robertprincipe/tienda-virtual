@@ -172,7 +172,7 @@ export function SearchDropdown() {
                         {product.name}
                       </h4>
                       <p className="text-primary font-semibold mt-1">
-                        ${parseFloat(product.price).toFixed(2)}
+                        S/. {parseFloat(product.price).toFixed(2)}
                       </p>
                     </div>
                   </Link>

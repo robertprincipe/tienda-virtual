@@ -5,12 +5,14 @@ import { slugify } from "@/lib/utils";
 import { db } from "@/drizzle/db";
 import { categories } from "@/drizzle/schema";
 import {
+  and,
   asc,
   count,
   desc,
   eq,
   getTableColumns,
   ilike,
+  isNull,
   notInArray,
   or,
   sql,
@@ -86,12 +88,18 @@ export const getCategoriesInfinite = async (
   };
 };
 
-export const getCategories = async (filters?: { notInIds: number[] }) => {
+export const getCategories = async (filters?: {
+  notInIds?: number[];
+  onlyParents?: boolean;
+}) => {
   const data = await db.query.categories.findMany({
     where: filters
-      ? filters.notInIds
-        ? notInArray(categories.id, filters.notInIds)
-        : undefined
+      ? and(
+          filters.notInIds
+            ? notInArray(categories.id, filters.notInIds)
+            : undefined,
+          filters.onlyParents ? isNull(categories.parentId) : undefined
+        )
       : undefined,
   });
   return data;

@@ -14,6 +14,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { getSession } from "@/lib/session";
 import { validateCoupon } from "@/lib/coupon-validation";
 import { calculateOrderTotals } from "@/lib/order-calculations";
@@ -311,6 +312,12 @@ export async function placeOrder(
 
       return order;
     });
+
+    // Si es usuario anónimo, eliminar la cookie del carrito
+    if (!userId) {
+      const cookieStore = await cookies();
+      cookieStore.delete("cart_id");
+    }
 
     return {
       success: true,
@@ -723,6 +730,41 @@ export const deleteOrder = async (id: number) => {
     },
   };
 };
+
+/**
+ * Obtener órdenes de un usuario específico
+ */
+export async function getUserOrders(userId: number): Promise<{
+  success: boolean;
+  data?: OrderListItem[];
+  error?: string;
+}> {
+  try {
+    const userOrders = await db
+      .select({
+        ...getTableColumns(orders),
+        itemsCount: sql<number>`(
+          select count(*)
+          from order_items
+          where order_items.order_id = ${orders.id}
+        )`.as("itemsCount"),
+      })
+      .from(orders)
+      .where(eq(orders.userId, userId))
+      .orderBy(desc(orders.placedAt));
+
+    return {
+      success: true,
+      data: userOrders as OrderListItem[],
+    };
+  } catch (error) {
+    console.error("Error getting user orders:", error);
+    return {
+      success: false,
+      error: "Error al obtener las órdenes del usuario",
+    };
+  }
+}
 
 export const getOrderUsers = async () => {
   return await db.query.users.findMany({

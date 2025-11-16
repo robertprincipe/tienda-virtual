@@ -22,7 +22,7 @@ const formatDate = (value?: Date | string | null) => {
   if (Number.isNaN(date.getTime())) {
     return "-";
   }
-  return date.toLocaleDateString("es-ES", {
+  return date.toLocaleDateString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",

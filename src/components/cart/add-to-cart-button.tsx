@@ -1,15 +1,17 @@
 /**
- * Ejemplo de uso del carrito en un componente de producto
+ * Componentes modernos para agregar productos al carrito
  */
 
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/hooks/stores/cart.store";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 
+/**
+ * Botón simple para agregar al carrito (sin selector de cantidad)
+ */
 interface AddToCartButtonProps {
   productId: number;
   quantity?: number;
@@ -40,9 +42,8 @@ export function AddToCartButton({
 }
 
 /**
- * Ejemplo de uso en página de producto con selector de cantidad
+ * Componente completo con selector de cantidad para páginas de detalle de producto
  */
-
 interface ProductAddToCartProps {
   productId: number;
   stock: number;
@@ -59,76 +60,163 @@ export function ProductAddToCart({ productId, stock }: ProductAddToCartProps) {
     }
   };
 
-  const incrementQuantity = () => {
-    if (quantity < stock) {
-      setQuantity(quantity + 1);
-    }
-  };
-
-  const decrementQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
+  const handleQuantityChange = (delta: number) => {
+    const newQuantity = quantity + delta;
+    if (newQuantity >= 1 && newQuantity <= stock) {
+      setQuantity(newQuantity);
     }
   };
 
   const isOutOfStock = stock === 0;
 
+  if (isOutOfStock) {
+    return null;
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <div className="flex items-center border rounded-md">
+        <span className="text-sm font-semibold">Cantidad:</span>
+        <div className="flex items-center border-2 rounded-xl overflow-hidden">
           <Button
             variant="ghost"
             size="icon"
-            onClick={decrementQuantity}
+            onClick={() => handleQuantityChange(-1)}
             disabled={quantity <= 1 || loading}
+            className="h-12 w-12 rounded-none hover:bg-primary/10"
           >
-            <Minus className="h-4 w-4" />
+            <Minus className="h-5 w-5" />
           </Button>
-          <Input
-            type="number"
-            value={quantity}
-            onChange={(e) => {
-              const val = parseInt(e.target.value);
-              if (val > 0 && val <= stock) {
-                setQuantity(val);
-              }
-            }}
-            className="w-16 text-center border-0 focus-visible:ring-0"
-            min={1}
-            max={stock}
-            disabled={loading}
-          />
+          <span className="px-8 font-bold text-lg">{quantity}</span>
           <Button
             variant="ghost"
             size="icon"
-            onClick={incrementQuantity}
+            onClick={() => handleQuantityChange(1)}
             disabled={quantity >= stock || loading}
+            className="h-12 w-12 rounded-none hover:bg-primary/10"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-5 w-5" />
           </Button>
         </div>
-
-        {stock > 0 && stock < 10 && (
-          <p className="text-sm text-orange-600">
-            Solo quedan {stock} unidades
-          </p>
-        )}
       </div>
 
       <Button
         onClick={handleAddToCart}
-        disabled={isOutOfStock || loading}
-        className="w-full gap-2"
+        disabled={loading}
         size="lg"
+        className="w-full gap-3 h-14 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
       >
-        <ShoppingCart className="h-5 w-5" />
-        {loading
-          ? "Agregando..."
-          : isOutOfStock
-          ? "Agotado"
-          : "Agregar al carrito"}
+        <ShoppingCart className="h-6 w-6" />
+        {loading ? "Agregando..." : "Agregar al carrito"}
       </Button>
     </div>
+  );
+}
+
+/**
+ * Componente compacto para tarjetas de producto
+ */
+interface ProductCardAddToCartProps {
+  productId: number;
+  stock: number;
+  direction?: "horizontal" | "vertical";
+  size?: "sm" | "md" | "lg";
+}
+
+export function ProductCardAddToCart({
+  productId,
+  stock,
+  direction = "vertical",
+  size = "md",
+}: ProductCardAddToCartProps) {
+  const { addItem, loading } = useCartStore();
+  const [quantity, setQuantity] = useState(1);
+  const [showQuantity, setShowQuantity] = useState(false);
+
+  const handleAddToCart = async () => {
+    const success = await addItem(productId, quantity);
+    if (success) {
+      setQuantity(1);
+      setShowQuantity(false);
+    }
+  };
+
+  const handleQuantityChange = (delta: number) => {
+    const newQuantity = quantity + delta;
+    if (newQuantity >= 1 && newQuantity <= stock) {
+      setQuantity(newQuantity);
+    }
+  };
+
+  const isOutOfStock = stock === 0;
+
+  const buttonSizeClass = {
+    sm: "h-9 text-sm",
+    md: "h-10 text-base",
+    lg: "h-12 text-lg",
+  }[size];
+
+  const iconSizeClass = {
+    sm: "h-3 w-3",
+    md: "h-4 w-4",
+    lg: "h-5 w-5",
+  }[size];
+
+  if (isOutOfStock) {
+    return (
+      <Button disabled className={`w-full ${buttonSizeClass}`}>
+        Agotado
+      </Button>
+    );
+  }
+
+  if (showQuantity) {
+    return (
+      <div
+        className={`space-y-2 w-full ${
+          direction === "horizontal" ? "flex items-center gap-2" : ""
+        }`}
+      >
+        <div className="flex items-center border-2 rounded-lg overflow-hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleQuantityChange(-1)}
+            disabled={quantity <= 1 || loading}
+            className="h-9 w-9 rounded-none hover:bg-primary/10"
+          >
+            <Minus className="h-4 w-4" />
+          </Button>
+          <span className="flex-1 text-center font-bold">{quantity}</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleQuantityChange(1)}
+            disabled={quantity >= stock || loading}
+            className="h-9 w-9 rounded-none hover:bg-primary/10"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        <Button
+          onClick={handleAddToCart}
+          disabled={loading}
+          className={`w-full gap-2 ${buttonSizeClass}`}
+        >
+          <ShoppingCart className={iconSizeClass} />
+          {loading ? "Agregando..." : "Confirmar"}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      onClick={() => setShowQuantity(true)}
+      className={`w-full gap-2 ${buttonSizeClass}`}
+    >
+      <ShoppingCart className={iconSizeClass} />
+      Agregar
+    </Button>
   );
 }

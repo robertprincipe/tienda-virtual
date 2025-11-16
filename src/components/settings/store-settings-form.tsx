@@ -14,12 +14,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   storeSettingsFormSchema,
   type StoreSettingsFormValues,
@@ -97,14 +92,16 @@ export function StoreSettingsForm({
                     <FieldLabel htmlFor="company-name">
                       Nombre comercial
                     </FieldLabel>
-                  <Input
-                    {...field}
-                    id="company-name"
-                    value={field.value ?? ""}
-                    placeholder="Mi tienda"
-                    aria-invalid={fieldState.invalid}
-                  />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    <Input
+                      {...field}
+                      id="company-name"
+                      value={field.value ?? ""}
+                      placeholder="Mi tienda"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -116,50 +113,37 @@ export function StoreSettingsForm({
                     <FieldLabel htmlFor="legal-name">
                       Razón social (opcional)
                     </FieldLabel>
-                  <Input
-                    {...field}
-                    id="legal-name"
-                    value={field.value ?? ""}
-                    placeholder="Mi empresa S.A."
-                    aria-invalid={fieldState.invalid}
-                  />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    <Input
+                      {...field}
+                      id="legal-name"
+                      value={field.value ?? ""}
+                      placeholder="Mi empresa S.A."
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <Controller
-                name="taxId"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="tax-id">RFC / Tax ID</FieldLabel>
-                  <Input
-                    {...field}
-                    id="tax-id"
-                    value={field.value ?? ""}
-                    placeholder="123456789"
-                    aria-invalid={fieldState.invalid}
-                  />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
                 name="ruc"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="ruc">RUC</FieldLabel>
-                  <Input
-                    {...field}
-                    id="ruc"
-                    value={field.value ?? ""}
-                    placeholder="12345678901"
-                    aria-invalid={fieldState.invalid}
-                  />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    <Input
+                      {...field}
+                      id="ruc"
+                      value={field.value ?? ""}
+                      placeholder="12345678901"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -171,15 +155,17 @@ export function StoreSettingsForm({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="company-email">Correo</FieldLabel>
-                  <Input
-                    {...field}
-                    id="company-email"
-                    type="email"
-                    value={field.value ?? ""}
-                    placeholder="contacto@tienda.com"
-                    aria-invalid={fieldState.invalid}
-                  />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    <Input
+                      {...field}
+                      id="company-email"
+                      type="email"
+                      value={field.value ?? ""}
+                      placeholder="contacto@tienda.com"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -189,14 +175,16 @@ export function StoreSettingsForm({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="company-phone">Teléfono</FieldLabel>
-                  <Input
-                    {...field}
-                    id="company-phone"
-                    value={field.value ?? ""}
-                    placeholder="+51 999 999 999"
-                    aria-invalid={fieldState.invalid}
-                  />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    <Input
+                      {...field}
+                      id="company-phone"
+                      value={field.value ?? ""}
+                      placeholder="+51 999 999 999"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -208,31 +196,16 @@ export function StoreSettingsForm({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="company-line1">Dirección</FieldLabel>
-                <Input
-                  {...field}
-                  id="company-line1"
-                  value={field.value ?? ""}
-                  placeholder="Av. Siempre Viva 742"
-                  aria-invalid={fieldState.invalid}
-                />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="companyLine2"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="company-line2">Complemento</FieldLabel>
-                <Input
-                  {...field}
-                  id="company-line2"
-                  value={field.value ?? ""}
-                  placeholder="Oficina 301"
-                  aria-invalid={fieldState.invalid}
-                />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    <Input
+                      {...field}
+                      id="company-line1"
+                      value={field.value ?? ""}
+                      placeholder="Av. Siempre Viva 742"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -251,7 +224,9 @@ export function StoreSettingsForm({
                       placeholder="Lima"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -268,7 +243,9 @@ export function StoreSettingsForm({
                       placeholder="Lima"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -285,26 +262,9 @@ export function StoreSettingsForm({
                       placeholder="15000"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="companyCountryCode"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="company-country">País (ISO)</FieldLabel>
-                    <Input
-                      {...field}
-                      id="company-country"
-                      maxLength={2}
-                      value={field.value ?? ""}
-                      placeholder="PE"
-                      aria-invalid={fieldState.invalid}
-                      onChange={(event) => field.onChange(event.target.value.toUpperCase())}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -326,7 +286,9 @@ export function StoreSettingsForm({
                       onChange={(event) => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -342,7 +304,9 @@ export function StoreSettingsForm({
                       onChange={(event) => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -360,7 +324,9 @@ export function StoreSettingsForm({
                       onChange={(event) => field.onChange(event.target.value)}
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -377,31 +343,14 @@ export function StoreSettingsForm({
                       placeholder="Inter"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
             </div>
             <div className="grid gap-4 md:grid-cols-3">
-              <Controller
-                name="currency"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="currency">Moneda (ISO)</FieldLabel>
-                    <Input
-                      {...field}
-                      id="currency"
-                      maxLength={3}
-                      value={field.value ?? ""}
-                      placeholder="USD"
-                      aria-invalid={fieldState.invalid}
-                      onChange={(event) => field.onChange(event.target.value.toUpperCase())}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
               <Controller
                 name="timezone"
                 control={form.control}
@@ -415,7 +364,9 @@ export function StoreSettingsForm({
                       placeholder="America/Lima"
                       aria-invalid={fieldState.invalid}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -428,7 +379,9 @@ export function StoreSettingsForm({
                       label="Logo"
                       description="Sube el logotipo en formato PNG o JPG (máx. 1MB)"
                       existingFiles={
-                        field.value ? [{ url: field.value, name: "Logo actual" }] : []
+                        field.value
+                          ? [{ url: field.value, name: "Logo actual" }]
+                          : []
                       }
                       onChange={(files) => {
                         handleLogoChange(files);
@@ -447,7 +400,7 @@ export function StoreSettingsForm({
                   </div>
                 )}
               />
-           </div>
+            </div>
           </FieldGroup>
         </TabsContent>
         <TabsContent value="policies">
@@ -460,15 +413,17 @@ export function StoreSettingsForm({
                   <FieldLabel htmlFor="privacy-policy">
                     Política de privacidad
                   </FieldLabel>
-              <Textarea
-                {...field}
-                id="privacy-policy"
-                rows={6}
-                value={field.value ?? ""}
-                placeholder="Contenido HTML o texto de la política"
-                aria-invalid={fieldState.invalid}
-              />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  <Textarea
+                    {...field}
+                    id="privacy-policy"
+                    rows={6}
+                    value={field.value ?? ""}
+                    placeholder="Contenido HTML o texto de la política"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -480,15 +435,17 @@ export function StoreSettingsForm({
                   <FieldLabel htmlFor="terms">
                     Términos y condiciones
                   </FieldLabel>
-              <Textarea
-                {...field}
-                id="terms"
-                rows={6}
-                value={field.value ?? ""}
-                placeholder="Contenido HTML o texto"
-                aria-invalid={fieldState.invalid}
-              />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  <Textarea
+                    {...field}
+                    id="terms"
+                    rows={6}
+                    value={field.value ?? ""}
+                    placeholder="Contenido HTML o texto"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -500,15 +457,17 @@ export function StoreSettingsForm({
                   <FieldLabel htmlFor="shipping-policy">
                     Política de envíos
                   </FieldLabel>
-              <Textarea
-                {...field}
-                id="shipping-policy"
-                rows={6}
-                value={field.value ?? ""}
-                placeholder="Contenido de envíos"
-                aria-invalid={fieldState.invalid}
-              />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  <Textarea
+                    {...field}
+                    id="shipping-policy"
+                    rows={6}
+                    value={field.value ?? ""}
+                    placeholder="Contenido de envíos"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -520,15 +479,17 @@ export function StoreSettingsForm({
                   <FieldLabel htmlFor="refund-policy">
                     Política de devoluciones
                   </FieldLabel>
-              <Textarea
-                {...field}
-                id="refund-policy"
-                rows={6}
-                value={field.value ?? ""}
-                placeholder="Proceso y tiempos de devolución"
-                aria-invalid={fieldState.invalid}
-              />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  <Textarea
+                    {...field}
+                    id="refund-policy"
+                    rows={6}
+                    value={field.value ?? ""}
+                    placeholder="Proceso y tiempos de devolución"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />

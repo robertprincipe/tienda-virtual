@@ -37,17 +37,17 @@ import { parseIntSafety } from "@/lib/utils";
 
 const formatCurrency = (value?: string | number | null) => {
   if (value === null || value === undefined) {
-    return "$0.00";
+    return "S/. 0.00";
   }
 
   const numericValue = typeof value === "number" ? value : Number(value);
   if (Number.isNaN(numericValue)) {
-    return "$0.00";
+    return "S/. 0.00";
   }
 
-  return new Intl.NumberFormat("es-MX", {
+  return new Intl.NumberFormat("es-PE", {
     style: "currency",
-    currency: "MXN",
+    currency: "PEN",
     minimumFractionDigits: 2,
   }).format(numericValue);
 };
@@ -95,11 +95,11 @@ export default function OrderDetailPage() {
   const totals = useMemo(() => {
     if (!order) {
       return {
-        subtotal: "$0.00",
-        discount: "$0.00",
-        tax: "$0.00",
-        shipping: "$0.00",
-        total: "$0.00",
+        subtotal: "S/. 0.00",
+        discount: "S/. 0.00",
+        tax: "S/. 0.00",
+        shipping: "S/. 0.00",
+        total: "S/. 0.00",
       };
     }
     return {

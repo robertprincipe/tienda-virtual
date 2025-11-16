@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
+import { CategoryCard } from "@/components/cards/category-card";
 
 const Page = async () => {
   const categories = await getCategories();
 
   // Filter only parent categories for display
-  const parentCategories = categories.filter((cat) => !cat.parentId);
+  const parentCategories = categories;
 
   return (
     <div className="container py-8">
@@ -26,44 +27,13 @@ const Page = async () => {
           ).length;
 
           return (
-            <Link key={category.id} href={`/categories/${category.slug}`}>
-              <Card className="overflow-hidden hover:shadow-lg transition-shadow group h-full">
-                <div className="relative aspect-square bg-muted">
-                  {category.imageUrl ? (
-                    <Image
-                      src={category.imageUrl}
-                      alt={category.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                      Sin imagen
-                    </div>
-                  )}
-                </div>
-
-                <CardHeader className="p-4">
-                  <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                    {category.name}
-                  </CardTitle>
-                  {category.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
-                      {category.description}
-                    </p>
-                  )}
-                </CardHeader>
-
-                <CardContent className="p-4 pt-0">
-                  {childrenCount > 0 && (
-                    <Badge variant="secondary">
-                      {childrenCount} subcategoría{childrenCount > 1 ? "s" : ""}
-                    </Badge>
-                  )}
-                </CardContent>
-              </Card>
-            </Link>
+            <CategoryCard
+              childrenCount={childrenCount}
+              key={category.id}
+              title={category.name}
+              image={category.imageUrl ?? ""}
+              slug={category.slug}
+            />
           );
         })}
       </div>

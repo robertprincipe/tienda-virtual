@@ -225,7 +225,7 @@ export default function ShowCategory() {
                 Fecha de Creación
               </p>
               <p className="text-sm">
-                {new Date(category.createdAt || "").toLocaleString("es-ES", {
+                {new Date(category.createdAt || "").toLocaleString("es-PE", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -239,7 +239,7 @@ export default function ShowCategory() {
                 Última Actualización
               </p>
               <p className="text-sm">
-                {new Date(category.updatedAt || "").toLocaleString("es-ES", {
+                {new Date(category.updatedAt || "").toLocaleString("es-PE", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",

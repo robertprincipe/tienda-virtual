@@ -95,7 +95,7 @@ export const SiteHeader = () => {
           {/* Hamburger button - Mobile only */}
           <div className="flex items-center gap-2">
             <button
-              className="text-gray-700 transition hover:text-[#1E5B3E] md:hidden"
+              className="text-gray-700 transition hover:text-[#1E5B3E] lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (
@@ -108,40 +108,42 @@ export const SiteHeader = () => {
             <Link href="/">
               <div className="items-center font-heading text-2xl leading-4 font-bold tracking-tight text-[#1E5B3E]">
                 <h2>S & P</h2>
-                <span className="text-[16px]">Soluciones Integrales</span>
+                <span className="text-[16px] sm:block hidden">
+                  Soluciones Integrales
+                </span>
               </div>
             </Link>
           </div>
 
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav className="hidden items-center gap-8 lg:flex">
             <Link
               href="/categories"
-              className="text-sm text-gray-700 transition hover:text-[#1E5B3E]"
+              className="text-sm font-semibold text-gray-700 transition hover:text-[#1E5B3E]"
             >
               Categorias
             </Link>
             <Link
               href="/products"
-              className="text-sm text-gray-700 transition hover:text-[#1E5B3E]"
+              className="text-sm font-semibold text-gray-700 transition hover:text-[#1E5B3E]"
             >
               Productos
             </Link>
             <Link
               href="/about-us"
-              className="text-sm text-gray-700 transition hover:text-[#1E5B3E]"
+              className="text-sm font-semibold text-gray-700 transition hover:text-[#1E5B3E]"
             >
               Sobre nosotros
             </Link>
             <Link
               href="/contact"
-              className="text-sm text-gray-700 transition hover:text-[#1E5B3E]"
+              className="text-sm font-semibold text-gray-700 transition hover:text-[#1E5B3E]"
             >
               Contacto
             </Link>
           </nav>
 
           <div className="flex items-center gap-4">
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <SearchDropdown />
             </div>
             {!loading && (
@@ -219,7 +221,7 @@ export const SiteHeader = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <div className="flex items-center gap-2">
+                  <div className="lg:flex hidden items-center gap-2">
                     <Button variant="ghost" asChild>
                       <Link href="/login">Iniciar sesión</Link>
                     </Button>
@@ -237,7 +239,7 @@ export const SiteHeader = () => {
 
         {/* Mobile Menu */}
         <div
-          className={`absolute left-0 right-0 top-full border-b border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out md:hidden ${
+          className={`absolute left-0 right-0 top-full border-b border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out lg:hidden ${
             mobileMenuOpen
               ? "translate-y-0 opacity-100"
               : "pointer-events-none -translate-y-4 opacity-0"
@@ -281,11 +283,11 @@ export const SiteHeader = () => {
             </nav>
 
             {!user ? (
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" asChild>
+              <div className="flex items-center gap-2 mt-4">
+                <Button className="h-12 text-base" variant="ghost" asChild>
                   <Link href="/login">Iniciar sesión</Link>
                 </Button>
-                <Button asChild>
+                <Button className="h-12 text-base" asChild>
                   <Link href="/register">Registrarse</Link>
                 </Button>
               </div>

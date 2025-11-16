@@ -4,7 +4,7 @@ import { getSession } from "@/lib/session";
 
 const CART_COOKIE_NAME = "cart_id";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Rutas donde necesitamos validar/crear cart_id

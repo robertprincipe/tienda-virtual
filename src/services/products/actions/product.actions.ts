@@ -151,6 +151,7 @@ export const getProducts = async () => {
       name: true,
       sku: true,
       categoryId: true,
+      price: true,
     },
     orderBy: (products, { asc }) => asc(products.name),
   });

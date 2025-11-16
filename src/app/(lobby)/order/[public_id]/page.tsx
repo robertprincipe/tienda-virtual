@@ -15,9 +15,9 @@ import {
 } from "lucide-react";
 
 interface Props {
-  params: {
+  params: Promise<{
     public_id: string;
-  };
+  }>;
 }
 
 const statusConfig = {
@@ -58,7 +58,8 @@ const statusConfig = {
   },
 };
 
-export default async function OrderTrackingPage({ params }: Props) {
+export default async function OrderTrackingPage(props: Props) {
+  const params = await props.params;
   const result = await getOrderByPublicId(params.public_id);
 
   if (!result.success || !result.data) {

@@ -2,6 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
+import Link from "next/link";
 import type { SessionUser } from "@/types/auth";
 
 interface AccountClientProps {
@@ -21,8 +24,14 @@ export default function AccountClient({ user }: AccountClientProps) {
 
         <TabsContent value="profile" className="mt-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Información Personal</CardTitle>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/account/edit">
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Editar perfil
+                </Link>
+              </Button>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>

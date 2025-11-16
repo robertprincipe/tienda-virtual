@@ -3,7 +3,17 @@
 import { db } from "@/drizzle/db";
 import { carts, cartItems, products, users } from "@/drizzle/schema";
 import { orders, orderItems, couponRedemptions } from "@/drizzle/schema/orders";
-import { eq, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  or,
+  sql,
+} from "drizzle-orm";
 import { getSession } from "@/lib/session";
 import { validateCoupon } from "@/lib/coupon-validation";
 import { calculateOrderTotals } from "@/lib/order-calculations";
@@ -14,6 +24,14 @@ import {
 } from "@/schemas/checkout.schema";
 import { nanoid } from "nanoid";
 import type { CartItemWithProduct } from "@/services/cart/actions/cart.actions";
+import {
+  orderFormSchema,
+  type GetPaginatedOrdersQueryProps,
+  type OrderFormValues,
+  type OrderListItem,
+  type OrderWithRelations,
+} from "@/schemas/order.schema";
+import type { PaginatedOrders } from "@/types/order";
 
 export interface PlaceOrderResult {
   success: boolean;
@@ -350,3 +368,361 @@ export async function getOrderByPublicId(publicId: string) {
     };
   }
 }
+
+type NormalizedOrderItem = {
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+};
+
+const normalizeOrderItems = (
+  items: OrderFormValues["items"]
+): NormalizedOrderItem[] => {
+  const map = new Map<number, NormalizedOrderItem>();
+
+  items.forEach((item) => {
+    const current = map.get(item.productId);
+    if (current) {
+      map.set(item.productId, {
+        productId: item.productId,
+        quantity: current.quantity + item.quantity,
+        unitPrice: item.unitPrice,
+      });
+    } else {
+      map.set(item.productId, {
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      });
+    }
+  });
+
+  return Array.from(map.values()).filter(
+    (item) => item.quantity > 0 && item.unitPrice >= 0
+  );
+};
+
+const decimalToDbValue = (value: number) => value.toFixed(2);
+
+const buildOrderSort = (sort?: string) => {
+  const [column, direction] = sort?.split(".") ?? ["placedAt", "desc"];
+
+  switch (column) {
+    case "status":
+      return direction === "asc" ? asc(orders.status) : desc(orders.status);
+    case "total":
+      return direction === "asc" ? asc(orders.total) : desc(orders.total);
+    case "createdAt":
+      return direction === "asc"
+        ? asc(orders.createdAt)
+        : desc(orders.createdAt);
+    case "placedAt":
+    default:
+      return direction === "asc" ? asc(orders.placedAt) : desc(orders.placedAt);
+  }
+};
+
+const buildOrderFilters = (input: GetPaginatedOrdersQueryProps) => {
+  const search = input.search?.trim();
+
+  const searchFilter = search
+    ? or(
+        ilike(orders.publicId, `%${search}%`),
+        ilike(orders.email, `%${search}%`),
+        ilike(users.name, `%${search}%`),
+        ilike(users.email, `%${search}%`)
+      )
+    : undefined;
+
+  return and(
+    searchFilter,
+    input.status ? eq(orders.status, input.status) : undefined,
+    input.from ? sql`${orders.placedAt} >= ${input.from}` : undefined,
+    input.to ? sql`${orders.placedAt} <= ${input.to}` : undefined
+  );
+};
+
+const calculateOrderAmounts = (
+  items: NormalizedOrderItem[],
+  data: OrderFormValues
+) => {
+  const subtotal = items.reduce(
+    (acc, item) => acc + item.unitPrice * item.quantity,
+    0
+  );
+
+  const discount = data.discount ?? 0;
+  const tax = data.tax ?? 0;
+  const shipping = data.shipping ?? 0;
+  const total = Math.max(0, subtotal - discount + tax + shipping);
+
+  return { subtotal, discount, tax, shipping, total };
+};
+
+export const getOrdersPaginated = async (
+  input: GetPaginatedOrdersQueryProps
+): Promise<PaginatedOrders> => {
+  const filters = buildOrderFilters(input);
+  const offset = (input.page - 1) * input.per_page;
+
+  const orderColumns = getTableColumns(orders);
+  const userColumns = {
+    id: users.id,
+    name: users.name,
+    email: users.email,
+  };
+
+  const itemsCount = sql<number>`(
+    select count(*)
+    from order_items
+    where order_items.order_id = ${orders.id}
+  )`.as("itemsCount");
+
+  const { data, total } = await db.transaction(async (tx) => {
+    const data = await tx
+      .select({
+        ...orderColumns,
+        user: userColumns,
+        itemsCount,
+      })
+      .from(orders)
+      .leftJoin(users, eq(users.id, orders.userId))
+      .where(filters)
+      .orderBy(buildOrderSort(input.sort))
+      .limit(input.per_page)
+      .offset(offset);
+
+    const total = await tx
+      .select({ count: count() })
+      .from(orders)
+      .leftJoin(users, eq(users.id, orders.userId))
+      .where(filters)
+      .execute()
+      .then((rows) => rows[0]?.count ?? 0);
+
+    return { data, total };
+  });
+
+  const pageCount = Math.ceil(total / input.per_page);
+
+  return {
+    message: "Orders fetched successfully",
+    result: {
+      data: data as OrderListItem[],
+      count: data.length,
+      pageCount,
+      total,
+      nextPage: input.page < pageCount ? input.page + 1 : null,
+      currentPage: input.page,
+      minMax: {
+        min: data.length > 0 ? (input.page - 1) * input.per_page + 1 : 0,
+        max:
+          data.length > 0 ? (input.page - 1) * input.per_page + data.length : 0,
+      },
+    },
+  };
+};
+
+export const getOrder = async (id: number) => {
+  const order = await db.query.orders.findFirst({
+    where: eq(orders.id, id),
+    with: {
+      user: {
+        columns: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      items: {
+        with: {
+          product: {
+            columns: {
+              id: true,
+              name: true,
+              sku: true,
+              price: true,
+            },
+          },
+        },
+        orderBy: (orderItems, { asc }) => asc(orderItems.id),
+      },
+    },
+  });
+
+  if (!order) {
+    return null;
+  }
+
+  return {
+    ...order,
+    items: order.items.map((item) => ({
+      ...item,
+      quantity: Number(item.quantity),
+      unitPrice: Number(item.unitPrice),
+    })),
+  } as OrderWithRelations;
+};
+
+export const createOrder = async (input: OrderFormValues) => {
+  const data = orderFormSchema.parse(input);
+  const items = normalizeOrderItems(data.items);
+
+  if (items.length === 0) {
+    throw new Error("Agrega al menos un producto al pedido");
+  }
+
+  const totals = calculateOrderAmounts(items, data);
+
+  const orderId = await db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(orders)
+      .values({
+        publicId: generatePublicId(),
+        userId: data.userId ?? null,
+        email: data.email,
+        status: data.status ?? "created",
+        subtotal: decimalToDbValue(totals.subtotal),
+        discount: decimalToDbValue(totals.discount),
+        tax: decimalToDbValue(totals.tax),
+        shipping: decimalToDbValue(totals.shipping),
+        total: decimalToDbValue(totals.total),
+        couponCode: data.couponCode ?? null,
+        notes: data.notes ?? null,
+        fullName: data.fullName,
+        line1: data.line1,
+        line2: data.line2 ?? null,
+        city: data.city,
+        region: data.region ?? null,
+        postalCode: data.postalCode ?? null,
+        countryCode: data.countryCode,
+        phone: data.phone ?? null,
+        shippingMethodName: data.shippingMethodName ?? null,
+        shippingCarrier: data.shippingCarrier ?? null,
+        shippingTrackingNumber: data.shippingTrackingNumber ?? null,
+        shippedAt: data.shippedAt ?? null,
+        deliveredAt: data.deliveredAt ?? null,
+        placedAt: data.placedAt ?? new Date(),
+        canceledAt: data.canceledAt ?? null,
+      })
+      .returning({ id: orders.id });
+
+    await tx.insert(orderItems).values(
+      items.map((item) => ({
+        orderId: created.id,
+        productId: item.productId,
+        unitPrice: decimalToDbValue(item.unitPrice),
+        quantity: item.quantity.toString(),
+      }))
+    );
+
+    return created.id;
+  });
+
+  return {
+    message: `Orden #${orderId} creada correctamente`,
+    result: {
+      id: orderId,
+    },
+  };
+};
+
+export const updateOrder = async (input: OrderFormValues & { id: number }) => {
+  const { id, ...rest } = input;
+  const data = orderFormSchema.parse(rest);
+  const items = normalizeOrderItems(data.items);
+
+  if (items.length === 0) {
+    throw new Error("Agrega al menos un producto al pedido");
+  }
+
+  const totals = calculateOrderAmounts(items, data);
+
+  const updatedId = await db.transaction(async (tx) => {
+    const [updated] = await tx
+      .update(orders)
+      .set({
+        userId: data.userId ?? null,
+        email: data.email,
+        status: data.status ?? "created",
+        subtotal: decimalToDbValue(totals.subtotal),
+        discount: decimalToDbValue(totals.discount),
+        tax: decimalToDbValue(totals.tax),
+        shipping: decimalToDbValue(totals.shipping),
+        total: decimalToDbValue(totals.total),
+        couponCode: data.couponCode ?? null,
+        notes: data.notes ?? null,
+        fullName: data.fullName,
+        line1: data.line1,
+        line2: data.line2 ?? null,
+        city: data.city,
+        region: data.region ?? null,
+        postalCode: data.postalCode ?? null,
+        countryCode: data.countryCode,
+        phone: data.phone ?? null,
+        shippingMethodName: data.shippingMethodName ?? null,
+        shippingCarrier: data.shippingCarrier ?? null,
+        shippingTrackingNumber: data.shippingTrackingNumber ?? null,
+        shippedAt: data.shippedAt ?? null,
+        deliveredAt: data.deliveredAt ?? null,
+        placedAt: data.placedAt ?? new Date(),
+        canceledAt: data.canceledAt ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(orders.id, id))
+      .returning({ id: orders.id });
+
+    if (!updated) {
+      throw new Error("La orden no existe");
+    }
+
+    await tx.delete(orderItems).where(eq(orderItems.orderId, id));
+
+    await tx.insert(orderItems).values(
+      items.map((item) => ({
+        orderId: id,
+        productId: item.productId,
+        unitPrice: decimalToDbValue(item.unitPrice),
+        quantity: item.quantity.toString(),
+      }))
+    );
+
+    return updated.id;
+  });
+
+  return {
+    message: `Orden #${updatedId} actualizada correctamente`,
+    result: {
+      id: updatedId,
+    },
+  };
+};
+
+export const deleteOrder = async (id: number) => {
+  const [deleted] = await db
+    .delete(orders)
+    .where(eq(orders.id, id))
+    .returning({ id: orders.id });
+
+  if (!deleted) {
+    throw new Error("La orden no existe");
+  }
+
+  return {
+    message: `Orden #${deleted.id} eliminada correctamente`,
+    result: {
+      id: deleted.id,
+    },
+  };
+};
+
+export const getOrderUsers = async () => {
+  return await db.query.users.findMany({
+    columns: {
+      id: true,
+      name: true,
+      email: true,
+    },
+    orderBy: (users, { asc }) => asc(users.name),
+  });
+};

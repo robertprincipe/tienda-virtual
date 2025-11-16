@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { UserForm } from "@/components/users/user-form";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import type { UserFormValues } from "@/schemas/admin-user.schema";
 import { useCreateUser } from "@/services/users/mutations/admin-user.mutation";
+import { uploadFilesApi } from "@/services/upload/apis/upload.api";
 
 interface CreateUserPageProps {
   roles: Array<{ id: number; name: string }>;
@@ -22,6 +23,9 @@ interface CreateUserPageProps {
 
 export default function CreateUserPage({ roles }: CreateUserPageProps) {
   const { mutate, isPending } = useCreateUser();
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [fileError, setFileError] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
 
   const defaultValues = useMemo<UserFormValues>(
     () => ({
@@ -41,7 +45,21 @@ export default function CreateUserPage({ roles }: CreateUserPageProps) {
     [roles]
   );
 
-  const handleSubmit = (values: UserFormValues) => {
+  const handleSubmit = async (values: UserFormValues) => {
+    setFileError("");
+    if (photoFiles.length > 0) {
+      setIsUploading(true);
+      const uploaded = await uploadFilesApi(photoFiles);
+      setIsUploading(false);
+
+      if (uploaded.length === 0) {
+        setFileError("Error al subir la foto");
+        return;
+      }
+
+      values.photoUrl = uploaded[0]?.url;
+    }
+
     mutate(values);
   };
 
@@ -73,6 +91,12 @@ export default function CreateUserPage({ roles }: CreateUserPageProps) {
             roles={roles}
             isSubmitting={isPending}
             submitLabel="Crear usuario"
+            onPhotoChange={(files) => {
+              setPhotoFiles(files);
+              setFileError("");
+            }}
+            photoError={fileError}
+            isUploadingPhoto={isUploading}
           />
         </CardContent>
       </Card>

@@ -3,6 +3,7 @@
 import { Controller, Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { FileUpload } from "@/components/ui/file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -29,6 +30,11 @@ interface UserFormProps {
   roles: Array<{ id: number; name: string }>;
   isSubmitting?: boolean;
   submitLabel?: string;
+  onPhotoChange?: (files: File[]) => void;
+  photoError?: string;
+  existingPhotoUrl?: string | null;
+  isUploadingPhoto?: boolean;
+  onRemoveExistingPhoto?: () => void;
 }
 
 export function UserForm({
@@ -37,6 +43,11 @@ export function UserForm({
   roles,
   isSubmitting,
   submitLabel = "Guardar usuario",
+  onPhotoChange,
+  photoError,
+  existingPhotoUrl,
+  isUploadingPhoto,
+  onRemoveExistingPhoto,
 }: UserFormProps) {
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema) as unknown as Resolver<UserFormValues>,
@@ -264,17 +275,30 @@ export function UserForm({
             name="photoUrl"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="user-photo">Foto (URL)</FieldLabel>
-                <Input
-                  {...field}
-                  id="user-photo"
-                  value={field.value ?? ""}
-                  placeholder="https://"
-                  aria-invalid={fieldState.invalid}
+              <div>
+                <FileUpload
+                  label="Foto"
+                  description="Sube una imagen de perfil (máx. 1MB)"
+                  maxFiles={1}
+                  maxSize={1 * 1024 * 1024}
+                  onChange={(files) => {
+                    onPhotoChange?.(files);
+                    field.onChange(field.value);
+                  }}
+                  existingFiles={
+                    existingPhotoUrl
+                      ? [{ url: existingPhotoUrl, name: "Foto actual" }]
+                      : []
+                  }
+                  onDeleteExisting={() => {
+                    form.setValue("photoUrl", "");
+                    onPhotoChange?.([]);
+                    onRemoveExistingPhoto?.();
+                  }}
+                  disabled={isSubmitting || isUploadingPhoto}
+                  error={photoError || fieldState.error?.message}
                 />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
+              </div>
             )}
           />
         </div>

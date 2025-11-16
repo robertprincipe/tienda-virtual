@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Controller, Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { FileUpload } from "@/components/ui/file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -23,6 +24,7 @@ import {
   storeSettingsFormSchema,
   type StoreSettingsFormValues,
 } from "@/schemas/store-settings.schema";
+import { uploadFilesApi } from "@/services/upload/apis/upload.api";
 
 interface StoreSettingsFormProps {
   defaultValues: StoreSettingsFormValues;
@@ -43,10 +45,37 @@ export function StoreSettingsForm({
   });
 
   const [tab, setTab] = useState("company");
+  const [logoFiles, setLogoFiles] = useState<File[]>([]);
+  const [logoError, setLogoError] = useState("");
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+
+  const handleSubmit = async (values: StoreSettingsFormValues) => {
+    setLogoError("");
+
+    if (logoFiles.length > 0) {
+      setIsUploadingLogo(true);
+      const uploaded = await uploadFilesApi(logoFiles);
+      setIsUploadingLogo(false);
+
+      if (uploaded.length === 0) {
+        setLogoError("Error al subir el logo");
+        return;
+      }
+
+      values.logoUrl = uploaded[0]?.url;
+    }
+
+    onSubmit(values);
+  };
+
+  const handleLogoChange = (files: File[]) => {
+    setLogoFiles(files);
+    setLogoError("");
+  };
 
   return (
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(handleSubmit)}
       className="space-y-6"
       data-testid="store-settings-form"
     >
@@ -394,20 +423,31 @@ export function StoreSettingsForm({
                 name="logoUrl"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="logo">Logo (URL)</FieldLabel>
-                    <Input
-                      {...field}
-                      id="logo"
-                      value={field.value ?? ""}
-                      placeholder="https://..."
-                      aria-invalid={fieldState.invalid}
+                  <div>
+                    <FileUpload
+                      label="Logo"
+                      description="Sube el logotipo en formato PNG o JPG (máx. 1MB)"
+                      existingFiles={
+                        field.value ? [{ url: field.value, name: "Logo actual" }] : []
+                      }
+                      onChange={(files) => {
+                        handleLogoChange(files);
+                        field.onChange(field.value);
+                      }}
+                      onDeleteExisting={() => {
+                        field.onChange("");
+                        setLogoFiles([]);
+                        setLogoError("");
+                      }}
+                      maxFiles={1}
+                      maxSize={1 * 1024 * 1024}
+                      disabled={isSubmitting || isUploadingLogo}
+                      error={logoError || fieldState.error?.message}
                     />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
+                  </div>
                 )}
               />
-            </div>
+           </div>
           </FieldGroup>
         </TabsContent>
         <TabsContent value="policies">

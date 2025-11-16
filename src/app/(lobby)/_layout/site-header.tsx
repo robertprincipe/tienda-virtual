@@ -10,6 +10,7 @@ import { useScroll, useMotionValueEvent } from "framer-motion";
 // import SearchNavbar from "./search-navbar";
 import Link from "next/link";
 import { CartIcon } from "./cart-icon";
+import { SearchDropdown } from "@/components/search-dropdown";
 import { useCartStore } from "@/hooks/stores/cart.store";
 import { Button } from "@/components/ui/button";
 import {
@@ -90,10 +91,24 @@ export const SiteHeader = () => {
               />
             </button>
           </div>
-          {/* <SearchNavbar /> */}
+          <ul className="hidden md:flex items-center gap-6 text-sm font-medium">
+            <li>
+              <Link href="/products">Productos</Link>
+            </li>
+            <li>
+              <Link href="/categories">Categorías</Link>
+            </li>
+            <li>
+              <Link href="/about">Sobre nosotros</Link>
+            </li>
+            <li>
+              <Link href="/contact">Contacto</Link>
+            </li>
+          </ul>
+          <div className="hidden sm:flex items-center gap-4 flex-1 max-w-2xl">
+            <SearchDropdown />
+          </div>
           <div className="hidden sm:flex items-center gap-4">
-            <CartIcon />
-
             {!loading && (
               <>
                 {user ? (
@@ -112,6 +127,10 @@ export const SiteHeader = () => {
                             {getInitials(user.name)}
                           </AvatarFallback>
                         </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuLabel>
                         <div className="flex flex-col items-start text-left">
                           <span className="text-sm font-medium">
                             {user.name}
@@ -120,10 +139,7 @@ export const SiteHeader = () => {
                             {user.email}
                           </span>
                         </div>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
+                      </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link href="/account" className="cursor-pointer">
@@ -179,6 +195,7 @@ export const SiteHeader = () => {
                 )}
               </>
             )}
+            <CartIcon />
           </div>
         </nav>
       </header>

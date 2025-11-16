@@ -186,3 +186,17 @@ export const deleteCategory = async (id: number) => {
     },
   };
 };
+
+/**
+ * Get featured categories (with images, limited to specified count)
+ * @param limit - Maximum number of categories to return (default: 6)
+ */
+export const getFeaturedCategories = async (limit = 6) => {
+  const items = await db
+    .select()
+    .from(categories)
+    .orderBy(desc(categories.createdAt))
+    .limit(limit);
+
+  return items;
+};

@@ -25,11 +25,12 @@ export const searchProductsDropdown = async (
       name: products.name,
       slug: products.slug,
       price: products.price,
+      createdAt: products.createdAt,
       image: sql<string | null>`(
-        SELECT ${productImages.imageUrl}
-        FROM ${productImages}
-        WHERE ${productImages.productId} = ${products.id}
-        ORDER BY ${productImages.sortOrder} ASC
+        SELECT pi.image_url
+        FROM product_images pi
+        WHERE pi.product_id = products.id
+        ORDER BY pi.sort_order ASC
         LIMIT 1
       )`,
     })
@@ -100,33 +101,27 @@ export const searchProducts = async ({
   let orderByClause;
   switch (sort) {
     case "price-asc":
-      orderByClause = sql`${products.price} ASC`;
+      orderByClause = products.price;
       break;
     case "price-desc":
-      orderByClause = sql`${products.price} DESC`;
+      orderByClause = desc(products.price);
       break;
     case "name-asc":
-      orderByClause = sql`${products.name} ASC`;
+      orderByClause = products.name;
       break;
     case "name-desc":
-      orderByClause = sql`${products.name} DESC`;
+      orderByClause = desc(products.name);
       break;
     case "relevance":
     default:
-      // Simple relevance: prioritize exact matches in name
-      orderByClause = sql`
-        CASE 
-          WHEN LOWER(${products.name}) LIKE LOWER(${`%${searchTerm}%`}) THEN 1
-          ELSE 2
-        END,
-        ${products.createdAt} DESC
-      `;
+      // Order by most recent for relevance
+      orderByClause = desc(products.createdAt);
       break;
   }
 
   // Get products with images
   const results = await db
-    .selectDistinct({
+    .select({
       id: products.id,
       name: products.name,
       slug: products.slug,
@@ -135,10 +130,10 @@ export const searchProducts = async ({
       stock: products.stock,
       shortDesc: products.shortDesc,
       image: sql<string | null>`(
-        SELECT ${productImages.imageUrl}
-        FROM ${productImages}
-        WHERE ${productImages.productId} = ${products.id}
-        ORDER BY ${productImages.sortOrder} ASC
+        SELECT pi.image_url
+        FROM product_images pi
+        WHERE pi.product_id = products.id
+        ORDER BY pi.sort_order ASC
         LIMIT 1
       )`,
     })

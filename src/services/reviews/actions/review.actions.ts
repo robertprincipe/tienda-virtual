@@ -18,6 +18,7 @@ import {
   getTableColumns,
   ilike,
   or,
+  sql,
 } from "drizzle-orm";
 import {
   reviewFormSchema,
@@ -358,4 +359,40 @@ export const getReviewUsers = async () => {
     },
     orderBy: (users, { asc }) => asc(users.name),
   });
+};
+
+/**
+ * Get random approved reviews for homepage testimonials
+ * @param limit - Maximum number of reviews to return (default: 4)
+ */
+export const getRandomApprovedReviews = async (limit = 4) => {
+  const reviews = await db
+    .select({
+      id: productReviews.id,
+      rating: productReviews.rating,
+      title: productReviews.title,
+      body: productReviews.body,
+      createdAt: productReviews.createdAt,
+      user: {
+        id: users.id,
+        name: users.name,
+        photoUrl: users.photoUrl,
+      },
+      product: {
+        id: products.id,
+        name: products.name,
+        slug: products.slug,
+      },
+    })
+    .from(productReviews)
+    .leftJoin(users, eq(productReviews.userId, users.id))
+    .leftJoin(products, eq(productReviews.productId, products.id))
+    .where(eq(productReviews.isApproved, true))
+    .orderBy(sql`RANDOM()`)
+    .limit(limit);
+
+  return reviews.map((review) => ({
+    ...review,
+    rating: Number(review.rating),
+  }));
 };

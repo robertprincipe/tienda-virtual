@@ -1,17 +1,11 @@
 "use client";
 
-import * as React from "react";
-
-import { Icon } from "@iconify/react";
-
-import { Cart } from "./cart";
-import { useScroll, useMotionValueEvent } from "framer-motion";
-
-// import SearchNavbar from "./search-navbar";
 import Link from "next/link";
+import { Menu, Search, User, X, ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";
 import { CartIcon } from "./cart-icon";
 import { SearchDropdown } from "@/components/search-dropdown";
-import { useCartStore } from "@/hooks/stores/cart.store";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,14 +16,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import * as React from "react";
+
+import { Icon } from "@iconify/react";
+
+import { useScroll, useMotionValueEvent } from "framer-motion";
+
+import { useCartStore } from "@/hooks/stores/cart.store";
+
 import {
   getCurrentUser,
   logoutUser,
 } from "@/services/auth/actions/auth.actions";
 import { useRouter } from "next/navigation";
 import type { SessionUser } from "@/types/auth";
+import { Cart } from "./cart";
 
 export const SiteHeader = () => {
+  const [cartOpen, setCartOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const [hidden, setHidden] = React.useState(false);
   const [setOpen] = useCartStore((state) => [state.setOpen]);
   const [user, setUser] = React.useState<SessionUser | null>(null);
@@ -69,46 +76,74 @@ export const SiteHeader = () => {
       .slice(0, 2);
   };
 
+  // Cerrar menú mobile al cambiar de tamaño
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <>
-      <header className="border-b py-4 sticky top-0 inset-x-0 z-40 bg-white shadow-2xs">
-        <nav className="flex justify-between flex-col sm:flex-row container sm:items-center gap-4">
-          <div className="flex justify-between items-center">
-            <Link href="/">
-              <Icon
-                icon="fluent-emoji-flat:sunrise-over-mountains"
-                className="text-6xl"
-              />
-            </Link>
+      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+          {/* Hamburger button - Mobile only */}
+          <div className="flex items-center gap-2">
             <button
-              type="button"
-              className="sm:hidden"
-              onClick={() => setOpen(true)}
+              className="text-gray-700 transition hover:text-[#1E5B3E] md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              <Icon
-                icon="material-symbols-light:shopping-basket"
-                className="text-4xl"
-              />
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
+
+            <Link href="/">
+              <div className="items-center font-heading text-2xl leading-4 font-bold tracking-tight text-[#1E5B3E]">
+                <h2>S & P</h2>
+                <span className="text-[16px]">Soluciones Integrales</span>
+              </div>
+            </Link>
           </div>
-          <ul className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <li>
-              <Link href="/products">Productos</Link>
-            </li>
-            <li>
-              <Link href="/categories">Categorías</Link>
-            </li>
-            <li>
-              <Link href="/about">Sobre nosotros</Link>
-            </li>
-            <li>
-              <Link href="/contact">Contacto</Link>
-            </li>
-          </ul>
-          <div className="hidden sm:flex items-center gap-4 flex-1 max-w-2xl">
-            <SearchDropdown />
-          </div>
-          <div className="hidden sm:flex items-center gap-4">
+
+          <nav className="hidden items-center gap-8 md:flex">
+            <Link
+              href="/categories"
+              className="text-sm text-gray-700 transition hover:text-[#1E5B3E]"
+            >
+              Categorias
+            </Link>
+            <Link
+              href="/products"
+              className="text-sm text-gray-700 transition hover:text-[#1E5B3E]"
+            >
+              Productos
+            </Link>
+            <Link
+              href="/about-us"
+              className="text-sm text-gray-700 transition hover:text-[#1E5B3E]"
+            >
+              Sobre nosotros
+            </Link>
+            <Link
+              href="/contact"
+              className="text-sm text-gray-700 transition hover:text-[#1E5B3E]"
+            >
+              Contacto
+            </Link>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block">
+              <SearchDropdown />
+            </div>
             {!loading && (
               <>
                 {user ? (
@@ -195,9 +230,68 @@ export const SiteHeader = () => {
                 )}
               </>
             )}
+
             <CartIcon />
           </div>
-        </nav>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          className={`absolute left-0 right-0 top-full border-b border-gray-200 bg-white shadow-lg transition-all duration-300 ease-in-out md:hidden ${
+            mobileMenuOpen
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-4 opacity-0"
+          }`}
+        >
+          <div className="mx-auto max-w-7xl px-6 py-4">
+            {/* Search Bar */}
+            <SearchDropdown />
+
+            {/* Navigation Links */}
+            <nav className="space-y-1">
+              <Link
+                href="/products"
+                className="block border-b border-gray-200 py-3 text-base text-gray-900 transition hover:text-[#1E5B3E]"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Productos
+              </Link>
+              <Link
+                href="/categories"
+                className="flex items-center justify-between border-b border-gray-200 py-3 text-base text-gray-900 transition hover:text-[#1E5B3E]"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Categorías
+                <span className="text-gray-400">›</span>
+              </Link>
+              <Link
+                href="/products"
+                className="block border-b border-gray-200 py-3 text-base text-gray-900 transition hover:text-[#1E5B3E]"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Sobre nosotros
+              </Link>
+              <Link
+                href="/products"
+                className="block border-b border-gray-200 py-3 text-base text-gray-900 transition hover:text-[#1E5B3E]"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contactanos
+              </Link>
+            </nav>
+
+            {!user ? (
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" asChild>
+                  <Link href="/login">Iniciar sesión</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/register">Registrarse</Link>
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </div>
       </header>
       <Cart />
     </>

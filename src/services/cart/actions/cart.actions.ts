@@ -2,7 +2,7 @@
 
 import { db } from "@/drizzle/db";
 import { carts, cartItems, products } from "@/drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { getSession } from "@/lib/session";
 
@@ -19,6 +19,7 @@ export interface CartItemWithProduct {
     name: string;
     price: string;
     compareAtPrice: string | null;
+    primaryImage: string | null;
     slug: string;
     stock: number;
   };
@@ -104,6 +105,15 @@ export async function loadCart(): Promise<CartData | null> {
               slug: true,
               stock: true,
             },
+            extras: {
+              primaryImage: sql<string | null>`(
+                select product_images.image_url
+                from product_images
+                where product_images.product_id = ${products.id}
+                order by product_images.sort_order asc
+                limit 1
+              )`.as("primaryImage"),
+            },
           },
         },
       },
@@ -128,6 +138,7 @@ export async function loadCart(): Promise<CartData | null> {
         name: item.product.name,
         price: item.product.price,
         compareAtPrice: item.product.compareAtPrice,
+        primaryImage: item.product.primaryImage,
         slug: item.product.slug,
         stock: item.product.stock,
       },

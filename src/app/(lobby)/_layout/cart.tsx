@@ -120,6 +120,7 @@ interface CartItemCardProps {
       name: string;
       price: string;
       compareAtPrice: string | null;
+      primaryImage: string | null;
       slug: string;
       stock: number;
     };
@@ -165,9 +166,17 @@ export function CartItemCard({ item }: CartItemCardProps) {
         href={`/products/${item.product.slug}`}
         className="aspect-square bg-muted rounded-md overflow-hidden"
       >
-        <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
-          Sin imagen
-        </div>
+        {item.product.primaryImage ? (
+          <img
+            src={item.product.primaryImage}
+            alt={item.product.name}
+            className="w-full h-full object-cover object-center"
+          />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
+            Sin imagen
+          </div>
+        )}
       </Link>
       <div className="col-span-3 gap-2 grid grid-cols-3 md:grid-cols-4">
         <div className="col-span-2 md:col-span-3">

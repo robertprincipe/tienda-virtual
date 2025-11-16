@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Icon } from "@iconify/react";
 import { useCartStore } from "@/hooks/stores/cart.store";
 
@@ -11,12 +9,9 @@ export function CartIcon() {
   return (
     <button
       type="button"
-      className="hidden sm:block relative"
+      className="block relative hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 rounded-md px-1"
       onClick={() => setOpen(true)}
     >
-      {/* <PiShoppingCartBold className="text-4xl" /> */}
-      {/* <Icon icon="bi:cart-dash"/> */}
-      {/* <Icon icon="bitcoin-icons:cart-outline"  /> */}
       <Icon
         icon="material-symbols-light:shopping-basket"
         className="text-4xl"

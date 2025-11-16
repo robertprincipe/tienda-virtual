@@ -17,6 +17,7 @@ export interface CartStoreItem {
     name: string;
     price: string;
     compareAtPrice: string | null;
+    primaryImage: string | null;
     slug: string;
     stock: number;
   };

@@ -21,6 +21,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
+    console.log("User Role ID:", session.user.roleId);
+    console.log("User:", session.user);
+
     // Si es customer (roleId = 3) intentando acceder al dashboard
     if (pathname.startsWith("/dashboard") && session.user.roleId === 3) {
       return NextResponse.redirect(new URL("/", request.url));

@@ -1,3 +1,4 @@
+import type { CartListItem, CartWithRelations } from "@/schemas/cart.schema";
 import type { SelectProduct } from "@/schemas/product.schema";
 
 export interface CartItem {
@@ -33,3 +34,21 @@ export interface CartItemFormData {
 export interface UpdateCartItemFormData {
   quantity: number;
 }
+
+export interface PaginatedCarts {
+  message: string;
+  result: {
+    data: CartListItem[];
+    count: number;
+    pageCount: number;
+    total: number;
+    nextPage: number | null;
+    currentPage: number;
+    minMax: {
+      min: number;
+      max: number;
+    };
+  };
+}
+
+export type CartDetail = CartWithRelations;

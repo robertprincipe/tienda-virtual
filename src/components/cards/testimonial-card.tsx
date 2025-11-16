@@ -28,7 +28,7 @@ export function TestimonialCard({
       </div>
 
       {/* Quote */}
-      <p className="mb-4 text-gray-700">"{quote}"</p>
+      <p className="mb-4 text-gray-700">&quot;{quote}&quot;</p>
 
       {/* Author */}
       <div className="flex items-center gap-2">

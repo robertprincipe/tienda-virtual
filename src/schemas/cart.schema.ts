@@ -66,12 +66,12 @@ const optionalNumber = (message?: string) =>
 
 export const cartInsertSchema = createInsertSchema(carts, {
   userId: optionalNumber("Selecciona un usuario válido"),
-  status: z.enum(cartsStatuses.enumValues).default(
-    "active" as (typeof cartsStatuses.enumValues)[number]
-  ),
+  status: z
+    .enum(cartsStatuses.enumValues)
+    .default("active" as (typeof cartsStatuses.enumValues)[number]),
   expiresAt: z.preprocess(
     preprocessDate,
-    z.date({ invalid_type_error: "Fecha inválida" }).optional()
+    z.date({ error: "Fecha inválida" }).optional()
   ),
 });
 

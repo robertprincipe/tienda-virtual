@@ -311,3 +311,170 @@ export const deleteCoupon = async (id: number) => {
     },
   };
 };
+
+// ============================================
+// CHECKOUT - Aplicar cupón en el carrito
+// ============================================
+
+import { validateCoupon } from "@/lib/coupon-validation";
+import { calculateOrderTotals } from "@/lib/order-calculations";
+import { loadCart } from "@/services/cart/actions/cart.actions";
+import { applyCouponSchema } from "@/schemas/checkout.schema";
+import { getSession } from "@/lib/session";
+
+export interface ApplyCouponResult {
+  success: boolean;
+  error?: string;
+  data?: {
+    couponCode: string;
+    couponType: "percent" | "fixed";
+    couponValue: number;
+    subtotal: number;
+    discount: number;
+    tax: number;
+    shipping: number;
+    total: number;
+    eligibleItems: Array<{
+      productId: number;
+      productName: string;
+      discount: number;
+    }>;
+  };
+}
+
+/**
+ * Server action para aplicar un cupón al carrito
+ */
+export async function applyCoupon(
+  cartId: number,
+  couponCode: string
+): Promise<ApplyCouponResult> {
+  try {
+    // Validar entrada
+    const validated = applyCouponSchema.parse({
+      cartId,
+      couponCode: couponCode.toUpperCase().trim(),
+    });
+
+    // Obtener sesión para validación de usos por usuario
+    const session = await getSession();
+    const userId = session.user?.id;
+
+    // Cargar el carrito
+    const cartResult = await loadCart();
+
+    if (!cartResult) {
+      return {
+        success: false,
+        error: "Carrito no encontrado",
+      };
+    }
+
+    const cart = cartResult;
+
+    if (cart.items.length === 0) {
+      return {
+        success: false,
+        error: "El carrito está vacío",
+      };
+    }
+
+    // Obtener información completa de productos (incluyendo categoryId)
+    const productIds = cart.items.map((item) => item.productId);
+    const fullProducts = await db
+      .select({
+        id: products.id,
+        name: products.name,
+        price: products.price,
+        categoryId: products.categoryId,
+      })
+      .from(products)
+      .where(sql`${products.id} IN ${sql.raw(`(${productIds.join(",")})`)}`);
+
+    // Enriquecer items con categoryId
+    const enrichedItems = cart.items.map((item) => {
+      const fullProduct = fullProducts.find((p) => p.id === item.productId);
+      return {
+        ...item,
+        product: {
+          ...item.product,
+          categoryId: fullProduct?.categoryId || 0,
+        },
+      };
+    });
+
+    // Validar el cupón
+    const validation = await validateCoupon(
+      validated.couponCode,
+      enrichedItems,
+      userId
+    );
+
+    if (!validation.valid || !validation.coupon) {
+      return {
+        success: false,
+        error: validation.error || "Cupón inválido",
+      };
+    }
+
+    // Calcular montos con el cupón aplicado
+    const calculation = calculateOrderTotals(enrichedItems, {
+      couponType: validation.coupon.type,
+      couponValue: validation.coupon.value,
+      eligibleProductIds: validation.coupon.eligibleProductIds,
+      eligibleCategoryIds: validation.coupon.eligibleCategoryIds,
+    });
+
+    return {
+      success: true,
+      data: {
+        couponCode: validation.coupon.code,
+        couponType: validation.coupon.type,
+        couponValue: validation.coupon.value,
+        subtotal: calculation.subtotal,
+        discount: calculation.discount,
+        tax: calculation.tax,
+        shipping: calculation.shipping,
+        total: calculation.total,
+        eligibleItems: calculation.discountDetails?.appliedToItems || [],
+      },
+    };
+  } catch (error) {
+    console.error("Error applying coupon:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Error al aplicar el cupón",
+    };
+  }
+}
+
+/**
+ * Server action para remover un cupón aplicado
+ */
+export async function removeCoupon(
+  cartId: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Solo recalcular sin cupón
+    const cartResult = await loadCart();
+
+    if (!cartResult) {
+      return {
+        success: false,
+        error: "Carrito no encontrado",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error removing coupon:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Error al remover el cupón",
+    };
+  }
+}

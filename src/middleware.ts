@@ -2,8 +2,27 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSession } from "@/lib/session";
 
+const CART_COOKIE_NAME = "cart_id";
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Rutas donde necesitamos validar/crear cart_id
+  const cartRoutes = ["/products", "/categories", "/checkout", "/cart"];
+  const needsCart = cartRoutes.some((route) => pathname.startsWith(route));
+
+  // Validar o crear cart_id si estamos en rutas relevantes
+  if (needsCart) {
+    const cartId = request.cookies.get(CART_COOKIE_NAME)?.value;
+
+    if (!cartId) {
+      // Si no hay cart_id, crear uno nuevo vía server action se hará en el cliente
+      // Aquí solo podemos setear un header para indicar que falta
+      const response = NextResponse.next();
+      response.headers.set("x-cart-missing", "true");
+      return response;
+    }
+  }
 
   // Rutas protegidas que requieren autenticación
   const protectedRoutes = ["/account", "/dashboard"];
@@ -21,9 +40,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    console.log("User Role ID:", session.user.roleId);
-    console.log("User:", session.user);
-
     // Si es customer (roleId = 3) intentando acceder al dashboard
     if (pathname.startsWith("/dashboard") && session.user.roleId === 3) {
       return NextResponse.redirect(new URL("/", request.url));
@@ -34,5 +50,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/account/:path*", "/dashboard/:path*"],
+  matcher: [
+    "/account/:path*",
+    "/dashboard/:path*",
+    "/products/:path*",
+    "/categories/:path*",
+    "/checkout/:path*",
+    "/cart/:path*",
+  ],
 };

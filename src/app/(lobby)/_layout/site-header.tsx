@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Search, User, X, ShoppingCart } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CartIcon } from "./cart-icon";
 import { SearchDropdown } from "@/components/search-dropdown";
@@ -21,10 +21,6 @@ import * as React from "react";
 
 import { Icon } from "@iconify/react";
 
-import { useScroll, useMotionValueEvent } from "framer-motion";
-
-import { useCartStore } from "@/hooks/stores/cart.store";
-
 import {
   getCurrentUser,
   logoutUser,
@@ -34,24 +30,11 @@ import type { SessionUser } from "@/types/auth";
 import { Cart } from "./cart";
 
 export const SiteHeader = () => {
-  const [cartOpen, setCartOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [hidden, setHidden] = React.useState(false);
-  const [setOpen] = useCartStore((state) => [state.setOpen]);
   const [user, setUser] = React.useState<SessionUser | null>(null);
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
-  const { scrollY } = useScroll();
-  const lastYRef = React.useRef(0);
-
-  useMotionValueEvent(scrollY, "change", (y) => {
-    const difference = y - lastYRef.current;
-    if (Math.abs(difference) > 180) {
-      setHidden(difference > 0);
-      lastYRef.current = y;
-    }
-  });
 
   React.useEffect(() => {
     getCurrentUser().then((currentUser) => {

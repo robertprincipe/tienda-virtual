@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Controller, Resolver, useForm } from "react-hook-form";
+import { Controller, Resolver, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { FileUpload } from "@/components/ui/file-upload";
@@ -68,13 +68,15 @@ export function StoreSettingsForm({
     setLogoError("");
   };
 
+  const storeId = useWatch({ control: form.control, name: "id" });
+
   return (
     <form
       onSubmit={form.handleSubmit(handleSubmit)}
       className="space-y-6"
       data-testid="store-settings-form"
     >
-      <input type="hidden" value={form.watch("id") ?? ""} readOnly hidden />
+      <input type="hidden" value={storeId ?? ""} readOnly hidden />
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="company">Empresa</TabsTrigger>

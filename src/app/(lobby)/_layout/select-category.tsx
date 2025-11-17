@@ -23,7 +23,7 @@ export default function SelectCategory({
 
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="w-44 sm:w-[240px] h-11 bg-zinc-200 focus:ring-0 focus:ring-transparent focus:border-transparent rounded-none rounded-l-md border-none">
+      <SelectTrigger className="w-44 sm:w-60 h-11 bg-zinc-200 focus:ring-0 focus:ring-transparent focus:border-transparent rounded-none rounded-l-md border-none">
         <SelectValue placeholder="Todo" />
       </SelectTrigger>
       <SelectContent>

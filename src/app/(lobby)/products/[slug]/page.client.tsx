@@ -109,7 +109,7 @@ export default function ProductDetailClient({
           {/* Image Gallery - Sticky on desktop */}
           <div className="lg:sticky lg:top-6 lg:self-start space-y-4 h-fit">
             {/* Main Carousel */}
-            <div className="relative aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-2xl overflow-hidden shadow-lg">
+            <div className="relative aspect-square bg-linear-to-br from-muted to-muted/50 rounded-2xl overflow-hidden shadow-lg">
               {hasImages ? (
                 <Carousel className="w-full h-full">
                   <CarouselContent>

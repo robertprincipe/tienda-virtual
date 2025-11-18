@@ -97,11 +97,7 @@ const ExpandableChat: React.FC<ExpandableChatProps> = ({
           <X className="h-4 w-4" />
         </Button>
       </div>
-      <ExpandableChatToggle
-        icon={icon}
-        isOpen={isOpen}
-        toggleChat={toggleChat}
-      />
+      <ExpandableChatToggle icon={icon} toggleChat={toggleChat} />
     </div>
   );
 };
@@ -137,7 +133,6 @@ ExpandableChatFooter.displayName = "ExpandableChatFooter";
 interface ExpandableChatToggleProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode;
-  isOpen: boolean;
   toggleChat: () => void;
 }
 

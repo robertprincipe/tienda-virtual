@@ -32,7 +32,10 @@ export function Cart() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent className="sm:max-w-lg p-0 inset-y-2 right-2 rounded-xl w-[calc(100%-16px)] h-[calc(100%-16px)] overflow-hidden border shadow-2xs">
+      <SheetContent
+        className="sm:max-w-lg p-0 inset-y-2 right-2 rounded-xl w-[calc(100%-16px)] h-[calc(100%-16px)] overflow-hidden border shadow-2xs"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <div className="flex flex-col h-full">
           <SheetHeader className="border-b p-6">
             <SheetTitle>

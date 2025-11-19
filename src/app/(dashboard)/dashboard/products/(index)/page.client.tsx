@@ -2,7 +2,9 @@
 
 import { FileText, Package, Plus } from "lucide-react";
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
 
 import { createColumns } from "@/components/products/columns";
 import { DataTable } from "@/components/products/data-table";
@@ -32,6 +34,12 @@ interface ProductsIndexProps {
 
 export default function ProductsIndex({ productsPromise }: ProductsIndexProps) {
   const products = React.use(productsPromise);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || ""
+  );
+  const debouncedSearch = useDebounce(searchValue, 500);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductListItem>();
 
@@ -53,9 +61,27 @@ export default function ProductsIndex({ productsPromise }: ProductsIndexProps) {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedSearch.trim()) {
+      params.set("search", debouncedSearch.trim());
+    } else {
+      params.delete("search");
+    }
+
+    params.set("page", "1");
+
+    const newUrl = `/dashboard/products?${params.toString()}`;
+    const currentUrl = `/dashboard/products?${searchParams.toString()}`;
+
+    if (newUrl !== currentUrl) {
+      router.push(newUrl, { scroll: false });
+    }
+  }, [debouncedSearch, router, searchParams]);
+
   const handleSearch = (value: string) => {
-    // Implementar búsqueda con router si es necesario
-    void value;
+    setSearchValue(value);
   };
 
   const stats = useMemo(() => {

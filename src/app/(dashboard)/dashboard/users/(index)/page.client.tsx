@@ -2,7 +2,9 @@
 
 import { Mail, Plus, User2 } from "lucide-react";
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
 
 import { createUserColumns } from "@/components/users/columns";
 import { DataTable } from "@/components/users/data-table";
@@ -32,6 +34,12 @@ interface UsersIndexProps {
 
 export default function UsersIndex({ usersPromise }: UsersIndexProps) {
   const users = React.use(usersPromise);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || ""
+  );
+  const debouncedSearch = useDebounce(searchValue, 500);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserListItem>();
 
@@ -53,8 +61,27 @@ export default function UsersIndex({ usersPromise }: UsersIndexProps) {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedSearch.trim()) {
+      params.set("search", debouncedSearch.trim());
+    } else {
+      params.delete("search");
+    }
+
+    params.set("page", "1");
+
+    const newUrl = `/dashboard/users?${params.toString()}`;
+    const currentUrl = `/dashboard/users?${searchParams.toString()}`;
+
+    if (newUrl !== currentUrl) {
+      router.push(newUrl, { scroll: false });
+    }
+  }, [debouncedSearch, router, searchParams]);
+
   const handleSearch = (value: string) => {
-    void value;
+    setSearchValue(value);
   };
 
   const stats = useMemo(() => {
@@ -90,12 +117,16 @@ export default function UsersIndex({ usersPromise }: UsersIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">Usuarios registrados</p>
+            <p className="text-xs text-muted-foreground">
+              Usuarios registrados
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Administradores</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Administradores
+            </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -118,7 +149,9 @@ export default function UsersIndex({ usersPromise }: UsersIndexProps) {
       <Card>
         <CardHeader>
           <CardTitle>Listado de usuarios</CardTitle>
-          <CardDescription>Controla roles, contactos y permisos</CardDescription>
+          <CardDescription>
+            Controla roles, contactos y permisos
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -137,7 +170,8 @@ export default function UsersIndex({ usersPromise }: UsersIndexProps) {
           <DialogHeader>
             <DialogTitle>¿Eliminar usuario?</DialogTitle>
             <DialogDescription>
-              Esta acción eliminará el usuario "{selectedUser?.email}".
+              Esta acción eliminará el usuario &quot;{selectedUser?.email}
+              &quot;.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

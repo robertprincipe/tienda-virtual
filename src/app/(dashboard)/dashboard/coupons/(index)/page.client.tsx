@@ -2,7 +2,9 @@
 
 import { BadgePercent, CalendarClock, Plus } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
 
 import { createColumns } from "@/components/coupons/columns";
 import { DataTable } from "@/components/coupons/data-table";
@@ -32,6 +34,12 @@ interface CouponsIndexProps {
 
 export default function CouponsIndex({ couponsPromise }: CouponsIndexProps) {
   const coupons = React.use(couponsPromise);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || ""
+  );
+  const debouncedSearch = useDebounce(searchValue, 500);
   const [selectedCoupon, setSelectedCoupon] = useState<CouponListItem>();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -67,8 +75,27 @@ export default function CouponsIndex({ couponsPromise }: CouponsIndexProps) {
 
   const columns = createColumns(handleDelete);
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedSearch.trim()) {
+      params.set("search", debouncedSearch.trim());
+    } else {
+      params.delete("search");
+    }
+
+    params.set("page", "1");
+
+    const newUrl = `/dashboard/coupons?${params.toString()}`;
+    const currentUrl = `/dashboard/coupons?${searchParams.toString()}`;
+
+    if (newUrl !== currentUrl) {
+      router.push(newUrl, { scroll: false });
+    }
+  }, [debouncedSearch, router, searchParams]);
+
   const handleSearch = (value: string) => {
-    void value;
+    setSearchValue(value);
   };
 
   return (
@@ -145,8 +172,8 @@ export default function CouponsIndex({ couponsPromise }: CouponsIndexProps) {
           <DialogHeader>
             <DialogTitle>¿Eliminar cupón?</DialogTitle>
             <DialogDescription>
-              Esta acción eliminará "{selectedCoupon?.code}" y no se podrá
-              revertir.
+              Esta acción eliminará &quot;{selectedCoupon?.code}&quot; y no se
+              podrá revertir.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

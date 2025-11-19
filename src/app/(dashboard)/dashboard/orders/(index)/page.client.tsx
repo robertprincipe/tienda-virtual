@@ -8,7 +8,9 @@ import {
   TimerReset,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
 
 import { createOrderColumns } from "@/components/orders/columns";
 import { DataTable } from "@/components/orders/data-table";
@@ -38,6 +40,12 @@ interface OrdersIndexProps {
 
 export default function OrdersIndex({ ordersPromise }: OrdersIndexProps) {
   const orders = React.use(ordersPromise);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || ""
+  );
+  const debouncedSearch = useDebounce(searchValue, 500);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderListItem>();
 
@@ -59,8 +67,27 @@ export default function OrdersIndex({ ordersPromise }: OrdersIndexProps) {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedSearch.trim()) {
+      params.set("search", debouncedSearch.trim());
+    } else {
+      params.delete("search");
+    }
+
+    params.set("page", "1");
+
+    const newUrl = `/dashboard/orders?${params.toString()}`;
+    const currentUrl = `/dashboard/orders?${searchParams.toString()}`;
+
+    if (newUrl !== currentUrl) {
+      router.push(newUrl, { scroll: false });
+    }
+  }, [debouncedSearch, router, searchParams]);
+
   const handleSearch = (value: string) => {
-    void value;
+    setSearchValue(value);
   };
 
   const stats = useMemo(() => {
@@ -68,7 +95,10 @@ export default function OrdersIndex({ ordersPromise }: OrdersIndexProps) {
     const total = orders.result.total;
     const created = data.filter((item) => item.status === "created").length;
     const completed = data.filter((item) => item.status === "delivered").length;
-    const revenue = data.reduce((acc, order) => acc + Number(order.total ?? 0), 0);
+    const revenue = data.reduce(
+      (acc, order) => acc + Number(order.total ?? 0),
+      0
+    );
     const avg = data.length > 0 ? revenue / data.length : 0;
 
     return { total, created, completed, revenue, avg };
@@ -101,7 +131,9 @@ export default function OrdersIndex({ ordersPromise }: OrdersIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">Histórico registrado</p>
+            <p className="text-xs text-muted-foreground">
+              Histórico registrado
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -111,7 +143,9 @@ export default function OrdersIndex({ ordersPromise }: OrdersIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.created}</div>
-            <p className="text-xs text-muted-foreground">Estado "creada"</p>
+            <p className="text-xs text-muted-foreground">
+              Estado &quot;creada&quot;
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -126,7 +160,9 @@ export default function OrdersIndex({ ordersPromise }: OrdersIndexProps) {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ingresos promedio</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Ingresos promedio
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -163,7 +199,8 @@ export default function OrdersIndex({ ordersPromise }: OrdersIndexProps) {
           <DialogHeader>
             <DialogTitle>¿Eliminar pedido?</DialogTitle>
             <DialogDescription>
-              Esta acción eliminará permanentemente la orden "{selectedOrder?.publicId}".
+              Esta acción eliminará permanentemente la orden &quot;
+              {selectedOrder?.publicId}&quot;.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

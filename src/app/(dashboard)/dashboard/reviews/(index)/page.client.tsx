@@ -2,7 +2,9 @@
 
 import { CheckCircle2, MessageSquare, Plus, ShieldAlert } from "lucide-react";
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
 
 import { createReviewColumns } from "@/components/reviews/columns";
 import { DataTable } from "@/components/reviews/data-table";
@@ -32,6 +34,12 @@ interface ReviewsIndexProps {
 
 export default function ReviewsIndex({ reviewsPromise }: ReviewsIndexProps) {
   const reviews = React.use(reviewsPromise);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || ""
+  );
+  const debouncedSearch = useDebounce(searchValue, 500);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState<ReviewListItem>();
 
@@ -53,8 +61,27 @@ export default function ReviewsIndex({ reviewsPromise }: ReviewsIndexProps) {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedSearch.trim()) {
+      params.set("search", debouncedSearch.trim());
+    } else {
+      params.delete("search");
+    }
+
+    params.set("page", "1");
+
+    const newUrl = `/dashboard/reviews?${params.toString()}`;
+    const currentUrl = `/dashboard/reviews?${searchParams.toString()}`;
+
+    if (newUrl !== currentUrl) {
+      router.push(newUrl, { scroll: false });
+    }
+  }, [debouncedSearch, router, searchParams]);
+
   const handleSearch = (value: string) => {
-    void value;
+    setSearchValue(value);
   };
 
   const stats = useMemo(() => {
@@ -117,7 +144,9 @@ export default function ReviewsIndex({ reviewsPromise }: ReviewsIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pending}</div>
-            <p className="text-xs text-muted-foreground">En espera de revisión</p>
+            <p className="text-xs text-muted-foreground">
+              En espera de revisión
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -126,8 +155,12 @@ export default function ReviewsIndex({ reviewsPromise }: ReviewsIndexProps) {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.avgRating.toFixed(1)}</div>
-            <p className="text-xs text-muted-foreground">Calificación promedio</p>
+            <div className="text-2xl font-bold">
+              {stats.avgRating.toFixed(1)}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Calificación promedio
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -154,7 +187,8 @@ export default function ReviewsIndex({ reviewsPromise }: ReviewsIndexProps) {
           <DialogHeader>
             <DialogTitle>¿Eliminar reseña?</DialogTitle>
             <DialogDescription>
-              Esta acción eliminará la reseña de {selectedReview?.product?.name ?? "producto"}.
+              Esta acción eliminará la reseña de{" "}
+              {selectedReview?.product?.name ?? "producto"}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

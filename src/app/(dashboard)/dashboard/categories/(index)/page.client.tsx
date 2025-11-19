@@ -1,7 +1,9 @@
 "use client";
 
 import { FileText, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
 
 import { createColumns } from "@/components/categories/columns";
 import { DataTable } from "@/components/categories/data-table";
@@ -35,12 +37,19 @@ export default function CategoriesIndex({
   categoriesPromise,
 }: CategoriesIndexProps) {
   const categories = React.use(categoriesPromise);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || ""
+  );
+  const debouncedSearch = useDebounce(searchValue, 500);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<
     SelectCategory | undefined
   >();
 
-  const { mutate: deleteCategoryMutate } = useDeleteCategory();
+  const { mutate: deleteCategoryMutate, isPending: isPendingDeleteCategory } =
+    useDeleteCategory();
 
   const handleDelete = (category: SelectCategory) => {
     setSelectedCategory(category);
@@ -58,12 +67,27 @@ export default function CategoriesIndex({
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedSearch.trim()) {
+      params.set("search", debouncedSearch.trim());
+    } else {
+      params.delete("search");
+    }
+
+    params.set("page", "1");
+
+    const newUrl = `/dashboard/categories?${params.toString()}`;
+    const currentUrl = `/dashboard/categories?${searchParams.toString()}`;
+
+    if (newUrl !== currentUrl) {
+      router.push(newUrl, { scroll: false });
+    }
+  }, [debouncedSearch, router, searchParams]);
+
   const handleSearch = (value: string) => {
-    // router.get(
-    //   "/dashboard/categories",
-    //   { search: value },
-    //   { preserveState: true, replace: true }
-    // );
+    setSearchValue(value);
   };
 
   const columns = createColumns(handleDelete);
@@ -164,10 +188,18 @@ export default function CategoriesIndex({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+            <Button
+              variant="outline"
+              disabled={isPendingDeleteCategory}
+              onClick={() => setIsDeleteOpen(false)}
+            >
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
+            <Button
+              variant="destructive"
+              disabled={isPendingDeleteCategory}
+              onClick={confirmDelete}
+            >
               Eliminar
             </Button>
           </DialogFooter>

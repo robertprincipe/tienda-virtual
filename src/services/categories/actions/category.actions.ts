@@ -36,19 +36,26 @@ export const getCategoriesInfinite = async (
   ]) ?? ["title", "desc"];
 
   const parent = alias(categories, "parent");
+  const productsCount =
+    sql<number>`(select count(*) from products where products.category_id = ${categories.id})`.as(
+      "products_count"
+    );
 
   const { data, total } = await db.transaction(async (tx) => {
     const data = await tx
       .select({
         ...getTableColumns(categories),
         parent,
+        productsCount,
       })
       .from(categories)
       .leftJoin(parent, eq(parent.id, categories.parentId))
       .offset(offset)
       .limit(input.per_page)
       .where(
-        or(input.name ? ilike(categories.name, `%${input.name}%`) : undefined)
+        or(
+          input.search ? ilike(categories.name, `%${input.search}%`) : undefined
+        )
       )
       .orderBy(
         column && column in categories
@@ -65,7 +72,9 @@ export const getCategoriesInfinite = async (
       })
       .from(categories)
       .where(
-        or(input.name ? ilike(categories.name, `%${input.name}%`) : undefined)
+        or(
+          input.search ? ilike(categories.name, `%${input.search}%`) : undefined
+        )
       )
       .execute()
       .then((res) => res[0]?.count ?? 0);

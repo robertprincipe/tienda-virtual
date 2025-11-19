@@ -342,7 +342,7 @@ export function OrderForm({
                       <Input
                         type="number"
                         min={0.01}
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberInputHandler(field)}
                         aria-invalid={fieldState.invalid}
@@ -362,7 +362,7 @@ export function OrderForm({
                       <Input
                         type="number"
                         min={0}
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberInputHandler(field)}
                         aria-invalid={fieldState.invalid}
@@ -414,7 +414,7 @@ export function OrderForm({
                 <Input
                   id="order-discount"
                   type="number"
-                  step="0.01"
+                  step="0.1"
                   value={field.value ?? ""}
                   onChange={numberInputHandler(field)}
                   aria-invalid={fieldState.invalid}
@@ -434,7 +434,7 @@ export function OrderForm({
                 <Input
                   id="order-tax"
                   type="number"
-                  step="0.01"
+                  step="0.1"
                   value={field.value ?? ""}
                   onChange={numberInputHandler(field)}
                   aria-invalid={fieldState.invalid}
@@ -454,7 +454,7 @@ export function OrderForm({
                 <Input
                   id="order-shipping"
                   type="number"
-                  step="0.01"
+                  step="0.1"
                   value={field.value ?? ""}
                   onChange={numberInputHandler(field)}
                   aria-invalid={fieldState.invalid}

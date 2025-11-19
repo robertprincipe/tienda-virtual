@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -27,7 +29,18 @@ import {
 import { placeOrder } from "@/services/orders/actions/order.actions";
 import { applyCoupon } from "@/services/coupons/actions/coupon.actions";
 import { useCartStore } from "@/hooks/stores/cart.store";
-import { Loader2, Ticket, X, ShoppingCart, MapPin } from "lucide-react";
+import {
+  Loader2,
+  Ticket,
+  X,
+  ShoppingCart,
+  MapPin,
+  CreditCard,
+  Smartphone,
+  Package,
+  ChevronDown,
+  Upload,
+} from "lucide-react";
 import type { ApplyCouponResult } from "@/services/coupons/actions/coupon.actions";
 
 interface Props {
@@ -49,6 +62,8 @@ export default function CheckoutClient({ user }: Props) {
   >(undefined);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [voucherFile, setVoucherFile] = useState<File | null>(null);
 
   const form = useForm<CheckoutFormInput>({
     resolver: zodResolver(
@@ -311,6 +326,284 @@ export default function CheckoutClient({ user }: Props) {
                         )}
                       />
                     </>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Método de Pago</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Todas las transacciones son seguras y encriptadas
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <RadioGroup
+                    value={paymentMethod}
+                    onValueChange={setPaymentMethod}
+                  >
+                    {/* Tarjeta de Crédito/Débito */}
+                    <div className="border rounded-lg overflow-hidden transition-all duration-300 hover:border-[#D95D24]">
+                      <label
+                        htmlFor="credit-card"
+                        className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
+                          paymentMethod === "credit-card"
+                            ? "bg-[#D95D24]/5 border-l-4 border-l-[#D95D24]"
+                            : ""
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem
+                            value="credit-card"
+                            id="credit-card"
+                          />
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="w-5 h-5 text-[#2E332A]" />
+                            <span className="font-medium">
+                              Tarjeta de Crédito/Débito
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg"
+                            alt="Visa"
+                            className="h-6"
+                          />
+                          <img
+                            src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                            alt="Mastercard"
+                            className="h-6"
+                          />
+                          <ChevronDown
+                            className={`w-5 h-5 transition-transform duration-300 ${
+                              paymentMethod === "credit-card"
+                                ? "rotate-180"
+                                : ""
+                            }`}
+                          />
+                        </div>
+                      </label>
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                          paymentMethod === "credit-card"
+                            ? "max-h-[400px] opacity-100"
+                            : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <div className="p-4 pt-0 space-y-4 bg-[#FDFCF9]">
+                          <div>
+                            <Label
+                              htmlFor="card-number"
+                              className="text-sm font-medium"
+                            >
+                              Número de Tarjeta
+                            </Label>
+                            <div className="relative mt-1">
+                              <Input
+                                id="card-number"
+                                placeholder="1234 5678 9012 3456"
+                                maxLength={19}
+                                className="pr-10"
+                              />
+                              <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label
+                                htmlFor="expiry"
+                                className="text-sm font-medium"
+                              >
+                                Fecha de Expiración (MM/AA)
+                              </Label>
+                              <Input
+                                id="expiry"
+                                placeholder="MM/AA"
+                                maxLength={5}
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label
+                                htmlFor="cvc"
+                                className="text-sm font-medium"
+                              >
+                                Código de Seguridad
+                              </Label>
+                              <Input
+                                id="cvc"
+                                placeholder="123"
+                                maxLength={4}
+                                className="mt-1"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <Label
+                              htmlFor="card-name"
+                              className="text-sm font-medium"
+                            >
+                              Nombre en la Tarjeta
+                            </Label>
+                            <Input
+                              id="card-name"
+                              placeholder="NOMBRE APELLIDO"
+                              className="mt-1 uppercase"
+                            />
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <Checkbox id="save-card" />
+                            <label
+                              htmlFor="save-card"
+                              className="text-sm text-muted-foreground cursor-pointer"
+                            >
+                              Usar dirección de envío como dirección de
+                              facturación
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Yape o Plin */}
+                    <div className="border rounded-lg overflow-hidden transition-all duration-300 hover:border-[#D95D24]">
+                      <label
+                        htmlFor="digital-wallet"
+                        className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
+                          paymentMethod === "digital-wallet"
+                            ? "bg-[#D95D24]/5 border-l-4 border-l-[#D95D24]"
+                            : ""
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem
+                            value="digital-wallet"
+                            id="digital-wallet"
+                          />
+                          <div className="flex items-center gap-2">
+                            <Smartphone className="w-5 h-5 text-[#2E332A]" />
+                            <span className="font-medium">Yape o Plin</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                            Yape
+                          </div>
+                          <div className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                            Plin
+                          </div>
+                          <ChevronDown
+                            className={`w-5 h-5 transition-transform duration-300 ${
+                              paymentMethod === "digital-wallet"
+                                ? "rotate-180"
+                                : ""
+                            }`}
+                          />
+                        </div>
+                      </label>
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                          paymentMethod === "digital-wallet"
+                            ? "max-h-[600px] opacity-100"
+                            : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <div className="p-4 pt-0 space-y-4 bg-[#FDFCF9]">
+                          <div className="flex flex-col items-center justify-center p-6 bg-white rounded-lg border-2 border-dashed">
+                            <p className="text-center font-medium mb-2">
+                              Escanea el código QR con Yape o Plin
+                            </p>
+                            <p className="text-xs text-muted-foreground mb-3 text-center">
+                              Ambas plataformas son interoperables
+                            </p>
+                            <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+                              <img
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=932454821"
+                                alt="QR Yape/Plin"
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                            <p className="text-sm text-muted-foreground text-center">
+                              Número:{" "}
+                              <span className="font-bold text-[#2E332A]">
+                                932 454 821
+                              </span>
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              A nombre de:{" "}
+                              <span className="font-bold text-[#2E332A]">
+                                SP Soluciones
+                              </span>
+                            </p>
+                          </div>
+                          <div className="space-y-2">
+                            <Label
+                              htmlFor="digital-voucher"
+                              className="text-sm font-medium"
+                            >
+                              Subir Voucher de Pago
+                            </Label>
+                            <div className="border-2 border-dashed rounded-lg p-4 hover:border-[#D95D24] transition-colors cursor-pointer">
+                              <label
+                                htmlFor="digital-voucher"
+                                className="flex flex-col items-center gap-2 cursor-pointer"
+                              >
+                                <Upload className="w-8 h-8 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground">
+                                  {voucherFile
+                                    ? voucherFile.name
+                                    : "Haz clic para subir tu voucher"}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  PNG, JPG hasta 5MB
+                                </span>
+                                <Input
+                                  id="digital-voucher"
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) =>
+                                    setVoucherFile(e.target.files?.[0] || null)
+                                  }
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pago Contra Entrega */}
+                    <div className="border rounded-lg overflow-hidden transition-all duration-300 hover:border-[#D95D24]">
+                      <label
+                        htmlFor="cash"
+                        className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
+                          paymentMethod === "cash"
+                            ? "bg-[#D95D24]/5 border-l-4 border-l-[#D95D24]"
+                            : ""
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <RadioGroupItem value="cash" id="cash" />
+                          <div className="flex items-center gap-2">
+                            <Package className="w-5 h-5 text-[#2E332A]" />
+                            <span className="font-medium">
+                              Pago Contra Entrega
+                            </span>
+                          </div>
+                        </div>
+                        <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                          Efectivo
+                        </div>
+                      </label>
+                    </div>
+                  </RadioGroup>
+
+                  {!paymentMethod && (
+                    <p className="text-sm text-muted-foreground text-center py-2">
+                      Selecciona un método de pago para continuar
+                    </p>
                   )}
                 </CardContent>
               </Card>

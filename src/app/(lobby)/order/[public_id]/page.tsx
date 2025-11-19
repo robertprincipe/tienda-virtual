@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Package,
   MapPin,
@@ -12,6 +14,8 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
+  MessageSquare,
+  ArrowRight,
 } from "lucide-react";
 import { Metadata } from "next";
 
@@ -95,6 +99,47 @@ export default async function OrderTrackingPage(props: Props) {
         <h1 className="text-3xl font-bold mb-2">Seguimiento de Orden</h1>
         <p className="text-muted-foreground">Orden #{order.publicId}</p>
       </div>
+
+      <Card className="mb-6 border-2 border-[#D95D24] bg-linear-to-r from-[#FDFCF9] to-orange-50">
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="p-3 bg-[#D95D24] rounded-full">
+                <MessageSquare className="w-6 h-6 text-white" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-[#2E332A]">
+                  ¿Cómo fue tu experiencia?
+                </h3>
+                <p className="text-[#2E332A]/80 text-base">
+                  Tu opinión es muy valiosa para nosotros. Completa esta breve
+                  encuesta de satisfacción y ayúdanos a mejorar nuestro
+                  servicio. Solo te tomará 2 minutos.
+                </p>
+                <div className="flex items-center gap-2 text-sm text-[#D95D24] font-medium">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Necesario para la investigación de tesis</span>
+                </div>
+              </div>
+            </div>
+            <Button
+              asChild
+              size="lg"
+              className="bg-[#D95D24] hover:bg-[#D95D24]/90 text-white font-bold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+            >
+              <Link
+                href="https://docs.google.com/forms/d/e/1FAIpQLSddgDSdBdMf2pPPTiZB9DCsTK_mvx_Y9vv5G6Iy16EvoOK9ag/viewform?usp=dialog"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 whitespace-nowrap"
+              >
+                Completar Encuesta
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Estado */}
       <Card className="mb-6">

@@ -64,8 +64,8 @@ export default function CreateProductPage({
       categoryId: undefined,
       shortDesc: "",
       description: "",
-      stock: 0,
-      price: 0,
+      stock: undefined,
+      price: undefined,
       compareAtPrice: undefined,
       purchasePrice: undefined,
       weightGrams: undefined,
@@ -113,9 +113,8 @@ export default function CreateProductPage({
   const numberChangeHandler =
     (field: { onChange: (value: number | undefined) => void }) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      field.onChange(
-        event.target.value === "" ? undefined : Number(event.target.value)
-      );
+      const value = event.target.value;
+      field.onChange(value === "" ? undefined : Number(value));
     };
 
   return (
@@ -333,7 +332,7 @@ export default function CreateProductPage({
                         {...field}
                         id="product-price"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0.00"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
@@ -357,7 +356,7 @@ export default function CreateProductPage({
                         {...field}
                         id="product-compare-price"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0.00"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
@@ -381,7 +380,7 @@ export default function CreateProductPage({
                         {...field}
                         id="product-purchase-price"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0.00"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
@@ -429,7 +428,7 @@ export default function CreateProductPage({
                         {...field}
                         id="product-weight"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
@@ -456,7 +455,7 @@ export default function CreateProductPage({
                         {...field}
                         id="product-length"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
@@ -480,7 +479,7 @@ export default function CreateProductPage({
                         {...field}
                         id="product-width"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
@@ -504,7 +503,7 @@ export default function CreateProductPage({
                         {...field}
                         id="product-height"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}

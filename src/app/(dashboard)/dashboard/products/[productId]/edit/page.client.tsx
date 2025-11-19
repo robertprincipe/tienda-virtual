@@ -148,9 +148,8 @@ export default function EditProductPage({
   const numberChangeHandler =
     (field: { onChange: (value: number | undefined) => void }) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      field.onChange(
-        event.target.value === "" ? undefined : Number(event.target.value)
-      );
+      const value = event.target.value;
+      field.onChange(value === "" ? undefined : Number(value));
     };
 
   return (
@@ -359,7 +358,7 @@ export default function EditProductPage({
                         {...field}
                         id="product-price"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
                         aria-invalid={fieldState.invalid}
@@ -382,7 +381,7 @@ export default function EditProductPage({
                         {...field}
                         id="product-compare-price"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
                         aria-invalid={fieldState.invalid}
@@ -405,7 +404,7 @@ export default function EditProductPage({
                         {...field}
                         id="product-purchase-price"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
                         aria-invalid={fieldState.invalid}
@@ -451,7 +450,7 @@ export default function EditProductPage({
                         {...field}
                         id="product-weight"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
                         aria-invalid={fieldState.invalid}
@@ -477,7 +476,7 @@ export default function EditProductPage({
                         {...field}
                         id="product-length"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
                         aria-invalid={fieldState.invalid}
@@ -500,7 +499,7 @@ export default function EditProductPage({
                         {...field}
                         id="product-width"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
                         aria-invalid={fieldState.invalid}
@@ -523,7 +522,7 @@ export default function EditProductPage({
                         {...field}
                         id="product-height"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
                         aria-invalid={fieldState.invalid}

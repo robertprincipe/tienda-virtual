@@ -100,9 +100,8 @@ export default function CreateCouponPage({
   const numberChangeHandler =
     (field: { onChange: (value: number | undefined) => void }) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      field.onChange(
-        event.target.value === "" ? undefined : Number(event.target.value)
-      );
+      const value = event.target.value;
+      field.onChange(value === "" ? undefined : Number(value));
     };
 
   return (
@@ -195,7 +194,7 @@ export default function CreateCouponPage({
                         {...field}
                         id="coupon-value"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0.00"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}
@@ -219,7 +218,7 @@ export default function CreateCouponPage({
                         {...field}
                         id="coupon-min-subtotal"
                         type="number"
-                        step="0.01"
+                        step="0.1"
                         placeholder="0.00"
                         value={field.value ?? ""}
                         onChange={numberChangeHandler(field)}

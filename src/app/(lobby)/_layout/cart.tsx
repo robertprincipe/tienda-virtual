@@ -96,9 +96,17 @@ export function Cart() {
               </div>
               <p className="text-xs text-muted-foreground">IGV incluido</p>
               <Link
+                href="/cart"
+                onClick={() => setOpen(false)}
+                className="bg-white text-zinc-950 border border-zinc-300 w-full rounded-md flex justify-center items-center gap-2 py-2 text-base hover:bg-zinc-50 transition-colors"
+              >
+                <Icon icon="solar:cart-large-2-linear" className="text-xl" />
+                <span>Ir al carrito</span>
+              </Link>
+              <Link
                 href="/checkout"
                 onClick={() => setOpen(false)}
-                className="bg-zinc-950 text-white w-full rounded-md flex justify-center items-center gap-1 py-2 text-lg hover:bg-zinc-800 transition-colors"
+                className="bg-primary text-white w-full rounded-md flex justify-center items-center gap-1 py-2 text-lg hover:bg-primary/90 transition-colors"
               >
                 <span>Ir a pagar</span>
               </Link>

@@ -53,7 +53,8 @@ interface Props {
 
 export default function CheckoutClient({ user }: Props) {
   const router = useRouter();
-  const { items, cartId, total, amount } = useCartStore();
+  const { items, cartId, amount, loading, syncCart } = useCartStore();
+  const [isInitializing, setIsInitializing] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState("");
@@ -87,12 +88,22 @@ export default function CheckoutClient({ user }: Props) {
 
   const useStoredAddress = form.watch("useStoredAddress");
 
-  // Redirigir si el carrito está vacío
+  // Sincronizar carrito al montar el componente
   useEffect(() => {
-    if (items.length === 0 && !cartId) {
+    const initializeCart = async () => {
+      await syncCart();
+      setIsInitializing(false);
+    };
+
+    initializeCart();
+  }, [syncCart]);
+
+  // Redirigir si el carrito está vacío (solo después de cargar)
+  useEffect(() => {
+    if (!isInitializing && items.length === 0 && !cartId) {
       router.push("/products");
     }
-  }, [items, cartId, router]);
+  }, [isInitializing, items, cartId, router]);
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -153,6 +164,17 @@ export default function CheckoutClient({ user }: Props) {
     }
   };
 
+  // Mostrar loader mientras se inicializa el carrito
+  if (isInitializing) {
+    return (
+      <div className="container max-w-6xl py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className="container max-w-6xl py-8">
@@ -167,8 +189,8 @@ export default function CheckoutClient({ user }: Props) {
     );
   }
 
-  const displayTotal = appliedCoupon ? appliedCoupon.total : total();
-  const displaySubtotal = appliedCoupon ? appliedCoupon.subtotal : total();
+  const displayTotal = appliedCoupon ? appliedCoupon.total : amount();
+  const displaySubtotal = appliedCoupon ? appliedCoupon.subtotal : amount();
   const displayDiscount = appliedCoupon ? appliedCoupon.discount : 0;
   const displayShipping = appliedCoupon ? appliedCoupon.shipping : 0;
   const displayTax = appliedCoupon ? appliedCoupon.tax : 0;

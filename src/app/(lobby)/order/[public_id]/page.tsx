@@ -100,8 +100,8 @@ export default async function OrderTrackingPage(props: Props) {
         <p className="text-muted-foreground">Orden #{order.publicId}</p>
       </div>
 
-      <Card className="mb-6 border-2 border-[#D95D24] bg-linear-to-r from-[#FDFCF9] to-orange-50">
-        <CardContent className="pt-6">
+      <Card className="mb-6 border-2 p-2 border-[#D95D24] bg-linear-to-r from-[#FDFCF9] to-orange-50">
+        <CardContent className="pt-2 px-2">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-start gap-4 flex-1">
               <div className="p-3 bg-[#D95D24] rounded-full">

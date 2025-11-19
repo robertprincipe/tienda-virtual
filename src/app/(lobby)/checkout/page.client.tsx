@@ -53,7 +53,7 @@ interface Props {
 
 export default function CheckoutClient({ user }: Props) {
   const router = useRouter();
-  const { items, cartId, amount, loading, syncCart } = useCartStore();
+  const { items, cartId, amount, syncCart } = useCartStore();
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -354,7 +354,9 @@ export default function CheckoutClient({ user }: Props) {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Método de Pago</CardTitle>
+                  <CardTitle>
+                    Método de Pago (solo con fines academicos)
+                  </CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">
                     Todas las transacciones son seguras y encriptadas
                   </p>

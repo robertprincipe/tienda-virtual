@@ -30,52 +30,60 @@ export default async function Index() {
   return (
     <div className="min-h-screen bg-[#FDFCF9] font-body text-[#1a1a1a]">
       {/* Hero Section */}
-      <section className="relative flex h-screen items-center justify-center overflow-hidden bg-[#2E332A]">
+      <section className="relative flex min-h-[50vh] items-center overflow-hidden bg-[#2E332A] py-12 lg:min-h-[60vh]">
         {/* Background Image Overlay */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
           style={{
             backgroundImage:
-              "url(https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2074)",
+              "url('https://ik.imagekit.io/huvmeuk1y/Generated%20Image%20November%2019,%202025%20-%209_18AM%20(1)_i4oBdc0-R.webp')",
           }}
         />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 text-left lg:px-8">
-          {/* Trust Signal */}
-          <div className="mb-4 flex items-center gap-2 text-sm text-white/90">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="h-4 w-4 fill-[#D95D24] text-[#D95D24]"
-                />
-              ))}
+        <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 lg:grid-cols-2 lg:items-center lg:px-8">
+          <div className="text-left">
+            {/* Trust Signal */}
+            <div className="mb-6 flex items-center gap-2 text-sm font-medium text-white/90">
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className="h-4 w-4 fill-[#D95D24] text-[#D95D24]"
+                  />
+                ))}
+              </div>
+              <span>Más de 40+ clientes satisfechos</span>
             </div>
-            <span>Más de 1,000+ clientes satisfechos</span>
+
+            {/* Main Title */}
+            <h1 className="mb-6 font-heading text-4xl font-bold leading-tight uppercase text-white md:text-5xl lg:text-6xl">
+              Productos
+              <br />
+              <span className="bg-primary/70 px-1.5 rounded-lg">
+                Orgánicos
+              </span>{" "}
+              de
+              <br />
+              Alta Calidad
+            </h1>
+
+            {/* Description */}
+            <p className="mb-8 max-w-lg text-lg text-white/90 md:text-xl">
+              Miel, quinua, café, leche, queso y más productos naturales que
+              apoyan tu bienestar y el de tu familia.
+            </p>
+
+            {/* CTA Button */}
+            <Link
+              href="/products"
+              className="inline-block rounded-md bg-[#D95D24] px-8 py-4 font-semibold uppercase tracking-wide text-white transition hover:bg-[#c04d1a]"
+            >
+              Ver Productos
+            </Link>
           </div>
 
-          {/* Main Title */}
-          <h1 className="mb-6 font-heading text-5xl font-bold leading-tight uppercase text-white md:text-7xl lg:text-8xl">
-            Productos
-            <br />
-            Orgánicos de
-            <br />
-            Alta Calidad
-          </h1>
-
-          {/* Description */}
-          <p className="mb-8 max-w-xl text-lg text-white/90 md:text-xl">
-            Miel, quinua, café, leche, queso y más productos naturales que
-            apoyan tu bienestar y el de tu familia.
-          </p>
-
-          {/* CTA Button */}
-          <Link
-            href="/products"
-            className="inline-block rounded-md bg-[#D95D24] px-8 py-4 font-semibold uppercase tracking-wide text-white transition hover:bg-[#c04d1a]"
-          >
-            Ver Productos
-          </Link>
+          {/* Right side placeholder */}
+          <div className="hidden lg:block"></div>
         </div>
       </section>
 

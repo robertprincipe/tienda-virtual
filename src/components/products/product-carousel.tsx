@@ -4,8 +4,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ProductCard } from "./product-card";
 import { ProductListItem } from "@/schemas/product.schema";
@@ -33,8 +31,6 @@ export function ProductCarousel({ products }: ProductCarouselProps) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="hidden md:flex" />
-      <CarouselNext className="hidden md:flex" />
     </Carousel>
   );
 }

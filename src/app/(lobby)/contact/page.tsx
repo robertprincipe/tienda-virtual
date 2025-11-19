@@ -1,6 +1,13 @@
 import { ContactForm } from "./_components/contact-form";
 import { getPublicStoreInfo } from "@/services/store-settings/actions/public-settings.actions";
 import Image from "next/image";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contacto",
+  description:
+    "¿Tienes preguntas? Contáctanos y nuestro equipo te ayudará. Estamos disponibles para resolver tus dudas y brindarte soporte.",
+};
 
 export default async function ContactPage() {
   const storeInfo = await getPublicStoreInfo();

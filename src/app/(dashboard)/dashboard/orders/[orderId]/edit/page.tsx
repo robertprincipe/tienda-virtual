@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 import {
   getOrder,
@@ -7,6 +8,12 @@ import {
 import { getProducts } from "@/services/products/actions/product.actions";
 
 import EditOrderPage from "./page.client";
+
+export const metadata: Metadata = {
+  title: "Editar Pedido",
+  description:
+    "Modifica los detalles de un pedido existente. Actualiza productos, cantidades, estado y datos de envío.",
+};
 
 type PageProps = {
   params: Promise<{ orderId: string }>;
@@ -26,9 +33,7 @@ const Page = async ({ params }: PageProps) => {
     notFound();
   }
 
-  return (
-    <EditOrderPage order={order} users={users} products={products} />
-  );
+  return <EditOrderPage order={order} users={users} products={products} />;
 };
 
 export default Page;

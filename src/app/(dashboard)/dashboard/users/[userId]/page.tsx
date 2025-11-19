@@ -31,7 +31,7 @@ const formatDate = (value?: Date | string | null) => {
   if (!value) return "-";
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleString("es-MX", {
+  return date.toLocaleString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -86,8 +86,11 @@ export default function UserDetailPage() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {buildFullName(user.name, user.paternalLastName, user.maternalLastName) ||
-                user.name}
+              {buildFullName(
+                user.name,
+                user.paternalLastName,
+                user.maternalLastName
+              ) || user.name}
             </h1>
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
@@ -143,9 +146,7 @@ export default function UserDetailPage() {
               <p className="text-muted-foreground">Dirección</p>
               <p>{user.line1 ?? "-"}</p>
               {user.line2 && <p>{user.line2}</p>}
-              <p>
-                {[user.city, user.region].filter(Boolean).join(", ") || ""}
-              </p>
+              <p>{[user.city, user.region].filter(Boolean).join(", ") || ""}</p>
             </div>
           </CardContent>
         </Card>
@@ -163,7 +164,11 @@ export default function UserDetailPage() {
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+            >
               Eliminar
             </Button>
           </DialogFooter>

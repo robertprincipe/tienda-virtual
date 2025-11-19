@@ -378,9 +378,9 @@ export function OrderForm({
                     Subtotal
                   </span>
                   <span className="text-base font-semibold">
-                    {new Intl.NumberFormat("es-MX", {
+                    {new Intl.NumberFormat("es-PE", {
                       style: "currency",
-                      currency: "MXN",
+                      currency: "PEN",
                       minimumFractionDigits: 2,
                     }).format(
                       (watchedItems?.[index]?.unitPrice ?? 0) *
@@ -474,9 +474,9 @@ export function OrderForm({
             <div className="flex items-center justify-between">
               <dt>Subtotal</dt>
               <dd>
-                {totals.subtotal.toLocaleString("es-MX", {
+                {totals.subtotal.toLocaleString("es-PE", {
                   style: "currency",
-                  currency: "MXN",
+                  currency: "PEN",
                 })}
               </dd>
             </div>
@@ -484,36 +484,36 @@ export function OrderForm({
               <dt>Descuento</dt>
               <dd>
                 -
-                {totals.discount.toLocaleString("es-MX", {
+                {totals.discount.toLocaleString("es-PE", {
                   style: "currency",
-                  currency: "MXN",
+                  currency: "PEN",
                 })}
               </dd>
             </div>
             <div className="flex items-center justify-between">
               <dt>Impuestos</dt>
               <dd>
-                {totals.tax.toLocaleString("es-MX", {
+                {totals.tax.toLocaleString("es-PE", {
                   style: "currency",
-                  currency: "MXN",
+                  currency: "PEN",
                 })}
               </dd>
             </div>
             <div className="flex items-center justify-between">
               <dt>Envío</dt>
               <dd>
-                {totals.shipping.toLocaleString("es-MX", {
+                {totals.shipping.toLocaleString("es-PE", {
                   style: "currency",
-                  currency: "MXN",
+                  currency: "PEN",
                 })}
               </dd>
             </div>
             <div className="flex items-center justify-between text-base font-semibold">
               <dt>Total</dt>
               <dd>
-                {totals.total.toLocaleString("es-MX", {
+                {totals.total.toLocaleString("es-PE", {
                   style: "currency",
-                  currency: "MXN",
+                  currency: "PEN",
                 })}
               </dd>
             </div>

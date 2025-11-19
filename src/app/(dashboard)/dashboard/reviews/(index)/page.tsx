@@ -1,8 +1,15 @@
 import { paginatedReviewsSchema } from "@/schemas/product-review.schema";
 import { getReviewsPaginated } from "@/services/reviews/actions/review.actions";
 import { type SearchParams } from "@/types/params";
+import { Metadata } from "next";
 
 import ReviewsIndex from "./page.client";
+
+export const metadata: Metadata = {
+  title: "Reseñas",
+  description:
+    "Administra las reseñas y calificaciones de productos. Modera comentarios, responde a clientes y mantén la calidad de las opiniones publicadas.",
+};
 
 type ReviewsPageProps = {
   searchParams: Promise<SearchParams>;

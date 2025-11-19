@@ -2,6 +2,13 @@ import { SearchParams } from "@/types/params";
 import CategoriesIndex from "./page.client";
 import { panginatedCategoriesSchema } from "@/schemas/category.schema";
 import { getCategoriesInfinite } from "@/services/categories/actions/category.actions";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Categorías",
+  description:
+    "Administra las categorías de productos de tu tienda. Crea, edita y organiza categorías para mejorar la navegación de tus clientes.",
+};
 
 type CategoriesPageProps = {
   searchParams: Promise<SearchParams>;

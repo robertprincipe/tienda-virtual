@@ -1,8 +1,15 @@
 import { getCategories } from "@/services/categories/actions/category.actions";
 import { getProduct } from "@/services/products/actions/product.actions";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 import EditProductPage from "./page.client";
+
+export const metadata: Metadata = {
+  title: "Editar Producto",
+  description:
+    "Actualiza la información de un producto. Modifica precio, inventario, imágenes y especificaciones del producto.",
+};
 
 type PageProps = {
   params: Promise<{ productId: string }>;

@@ -2,6 +2,13 @@ import { getCurrentUser } from "@/services/auth/actions/auth.actions";
 import { getUserOrders } from "@/services/orders/actions/order.actions";
 import { redirect } from "next/navigation";
 import AccountClient from "./page.client";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Mi Cuenta",
+  description:
+    "Administra tu cuenta, visualiza tus pedidos y actualiza tu información personal. Tu espacio personalizado de compras.",
+};
 
 export default async function AccountPage() {
   const user = await getCurrentUser();

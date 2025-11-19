@@ -1,8 +1,15 @@
 import { paginatedCouponsSchema } from "@/schemas/coupon.schema";
 import { getCouponsPaginated } from "@/services/coupons/actions/coupon.actions";
 import { type SearchParams } from "@/types/params";
+import { Metadata } from "next";
 
 import CouponsIndex from "./page.client";
+
+export const metadata: Metadata = {
+  title: "Cupones",
+  description:
+    "Administra cupones de descuento y promociones. Crea códigos promocionales, establece reglas de uso y controla la vigencia de las ofertas.",
+};
 
 type CouponsPageProps = {
   searchParams: Promise<SearchParams>;

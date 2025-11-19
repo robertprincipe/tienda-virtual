@@ -45,7 +45,7 @@ const formatDateTime = (value?: Date | string | null) => {
     return "-";
   }
 
-  return date.toLocaleString("es-MX", {
+  return date.toLocaleString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",

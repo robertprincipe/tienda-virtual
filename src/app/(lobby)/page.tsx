@@ -1,4 +1,5 @@
 import { CategoryCard } from "@/components/cards/category-card";
+import { Metadata } from "next";
 
 import { TestimonialCard } from "@/components/cards/testimonial-card";
 import { ProductCard } from "@/components/products/product-card";
@@ -8,6 +9,12 @@ import { getFeaturedProducts } from "@/services/products/actions/product.actions
 import { getRandomApprovedReviews } from "@/services/reviews/actions/review.actions";
 import { Star } from "lucide-react";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Inicio",
+  description:
+    "Descubre nuestra selección de productos destacados. Compra en línea con envío a todo el país. Calidad garantizada y los mejores precios.",
+};
 
 export default async function Index() {
   // Fetch data in parallel

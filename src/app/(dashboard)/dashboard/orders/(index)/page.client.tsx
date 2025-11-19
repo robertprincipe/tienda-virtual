@@ -167,9 +167,9 @@ export default function OrdersIndex({ ordersPromise }: OrdersIndexProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats.avg.toLocaleString("es-MX", {
+              {stats.avg.toLocaleString("es-PE", {
                 style: "currency",
-                currency: "MXN",
+                currency: "PEN",
               })}
             </div>
             <p className="text-xs text-muted-foreground">Ticket promedio</p>

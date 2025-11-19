@@ -1,7 +1,14 @@
 import { getRoles, getUser } from "@/services/users/actions/admin-user.actions";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 import EditUserPage from "./page.client";
+
+export const metadata: Metadata = {
+  title: "Editar Usuario",
+  description:
+    "Actualiza la información de un usuario. Modifica datos personales, cambia roles y gestiona permisos de acceso.",
+};
 
 type PageProps = {
   params: Promise<{ userId: string }>;

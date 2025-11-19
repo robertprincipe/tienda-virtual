@@ -1,6 +1,13 @@
 import { searchProducts } from "@/services/products/actions/search.actions";
 import { redirect } from "next/navigation";
 import SearchPageClient from "./page.client";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Buscar Productos",
+  description:
+    "Busca productos en nuestro catálogo. Encuentra rápidamente lo que necesitas con nuestro buscador.",
+};
 
 type SearchPageProps = {
   searchParams: Promise<{

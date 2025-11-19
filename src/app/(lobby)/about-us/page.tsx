@@ -2,6 +2,13 @@ import { getPublicStoreInfo } from "@/services/store-settings/actions/public-set
 import { CheckCircle, Heart, Leaf, ShieldCheck, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Nosotros",
+  description:
+    "Conoce nuestra historia, misión y valores. Descubre quiénes somos y por qué somos tu mejor opción de compra.",
+};
 
 export default async function AboutUsPage() {
   const storeInfo = await getPublicStoreInfo();

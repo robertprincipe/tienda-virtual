@@ -13,11 +13,29 @@ import {
   XCircle,
   Clock,
 } from "lucide-react";
+import { Metadata } from "next";
 
 interface Props {
   params: Promise<{
     public_id: string;
   }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { public_id } = await params;
+  const result = await getOrderByPublicId(public_id);
+
+  if (!result.success || !result.data) {
+    return {
+      title: "Pedido no encontrado",
+      description: "El pedido que buscas no existe o no está disponible.",
+    };
+  }
+
+  return {
+    title: `Pedido #${result.data.publicId}`,
+    description: `Detalles y estado de tu pedido #${result.data.publicId}. Seguimiento de envío y información de compra.`,
+  };
 }
 
 const statusConfig = {

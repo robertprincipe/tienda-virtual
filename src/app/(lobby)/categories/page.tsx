@@ -1,5 +1,12 @@
 import { getCategories } from "@/services/categories/actions/category.actions";
 import { CategoryCard } from "@/components/cards/category-card";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Categorías",
+  description:
+    "Navega por nuestras categorías de productos. Encuentra fácilmente lo que buscas organizado por tipo.",
+};
 
 const Page = async () => {
   const categories = await getCategories();

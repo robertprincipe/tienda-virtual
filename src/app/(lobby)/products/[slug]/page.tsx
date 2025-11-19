@@ -6,12 +6,34 @@ import {
 import { getSession } from "@/lib/session";
 import { notFound } from "next/navigation";
 import ProductDetailClient from "@/app/(lobby)/products/[slug]/page.client";
+import { Metadata } from "next";
 
 type ProductDetailPageProps = {
   params: Promise<{
     slug: string;
   }>;
 };
+
+export async function generateMetadata({
+  params,
+}: ProductDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+
+  if (!product || product.status !== "active") {
+    return {
+      title: "Producto no encontrado",
+      description: "El producto que buscas no está disponible.",
+    };
+  }
+
+  return {
+    title: product.name,
+    description:
+      product.description?.substring(0, 160) ||
+      `Compra ${product.name} en nuestra tienda. Producto de calidad al mejor precio.`,
+  };
+}
 
 const Page = async ({ params }: ProductDetailPageProps) => {
   const { slug } = await params;

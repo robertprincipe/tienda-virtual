@@ -32,7 +32,7 @@ export const useCategoriesInfinity = (searchTerm: string) => {
       getCategoriesInfinite({
         page: pageParam,
         per_page: 2,
-        name: searchTerm,
+        search: searchTerm,
       }),
     // fetchCategories(pageParam as string | null, searchTerm),
 

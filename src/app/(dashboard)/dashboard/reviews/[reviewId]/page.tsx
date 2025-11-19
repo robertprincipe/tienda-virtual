@@ -31,7 +31,7 @@ const formatDateTime = (value?: Date | string | null) => {
   if (!value) return "-";
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleString("es-MX", {
+  return date.toLocaleString("es-PE", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -114,9 +114,13 @@ export default function ReviewDetailPage() {
               <Star className="h-5 w-5 text-yellow-500" />
               {Number(review.rating ?? 0).toFixed(1)} / 9.9
             </div>
-            {review.title && <p className="text-lg font-medium">{review.title}</p>}
+            {review.title && (
+              <p className="text-lg font-medium">{review.title}</p>
+            )}
             <p className="text-sm">
-              {review.body?.trim() ? review.body : "Sin comentarios adicionales."}
+              {review.body?.trim()
+                ? review.body
+                : "Sin comentarios adicionales."}
             </p>
           </CardContent>
         </Card>
@@ -171,7 +175,9 @@ export default function ReviewDetailPage() {
           <CardContent className="space-y-2 text-sm">
             {review.user ? (
               <div>
-                <p className="font-medium">{review.user.name ?? "Sin nombre"}</p>
+                <p className="font-medium">
+                  {review.user.name ?? "Sin nombre"}
+                </p>
                 <p className="text-muted-foreground">{review.user.email}</p>
               </div>
             ) : (
@@ -193,7 +199,11 @@ export default function ReviewDetailPage() {
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isPending}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+            >
               Eliminar
             </Button>
           </DialogFooter>

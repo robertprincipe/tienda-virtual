@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.spsolucionesintegrales.com"),
   title: "S&P Soluciones Integrales",
   description:
     "Tienda virtual de productos orgánicos de alta calidad. Miel, quinua, café, leche, queso y más productos naturales para tu bienestar y el de tu familia.",
@@ -35,7 +36,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  metadataBase: new URL("https://www.spsolucionesintegrales.com"),
   twitter: {
     card: "summary_large_image",
     title: "S&P Soluciones Integrales - Productos Orgánicos de Alta Calidad",

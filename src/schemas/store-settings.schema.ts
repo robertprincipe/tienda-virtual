@@ -2,10 +2,9 @@ import { storeSettings } from "@/drizzle/schema";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-const optionalString = (max = 255) =>
+const optionalString = () =>
   z
     .string()
-    .max(max)
     .optional()
     .or(z.literal(""))
     .transform((value) => {
@@ -41,17 +40,17 @@ export const storeSettingsInsertSchema = createInsertSchema(storeSettings, {
     .string()
     .min(1, "El nombre de la empresa es obligatorio")
     .max(180),
-  legalName: optionalString(180),
-  taxId: optionalString(50),
-  ruc: optionalString(50),
-  email: optionalString(180),
-  phone: optionalString(32),
-  companyLine1: optionalString(200),
-  companyLine2: optionalString(200),
-  companyCity: optionalString(100),
-  companyRegion: optionalString(100),
-  companyPostalCode: optionalString(20),
-  companyCountryCode: optionalString(2)
+  legalName: optionalString(),
+  taxId: optionalString(),
+  ruc: optionalString(),
+  email: optionalString(),
+  phone: optionalString(),
+  companyLine1: optionalString(),
+  companyLine2: optionalString(),
+  companyCity: optionalString(),
+  companyRegion: optionalString(),
+  companyPostalCode: optionalString(),
+  companyCountryCode: optionalString()
     .transform((val) => val?.toUpperCase())
     .refine((val) => !val || val.length === 2, {
       message: "Usa el código ISO de 2 letras",
@@ -59,10 +58,10 @@ export const storeSettingsInsertSchema = createInsertSchema(storeSettings, {
   primaryColor: colorString,
   secondaryColor: optionalColorString,
   accentColor: optionalColorString,
-  fontFamily: optionalString(100),
+  fontFamily: optionalString(),
   currency: upperString(3),
   timezone: z.string().min(1, "Debes definir una zona horaria"),
-  logoUrl: optionalString(500),
+  logoUrl: optionalString(),
   privacyPolicyHtml: optionalString(),
   termsHtml: optionalString(),
   shippingPolicyHtml: optionalString(),
@@ -76,8 +75,8 @@ export const storeSettingsFormSchema = storeSettingsInsertSchema
   })
   .extend({
     id: z.number().int().optional(),
-    secondaryColor: optionalString(20),
-    accentColor: optionalString(20),
+    secondaryColor: optionalString(),
+    accentColor: optionalString(),
   });
 
 export type StoreSettingsFormValues = z.infer<typeof storeSettingsFormSchema>;

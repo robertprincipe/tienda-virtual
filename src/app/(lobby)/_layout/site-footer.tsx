@@ -83,6 +83,9 @@ export const SiteFooter = async () => {
                 <li>
                   <Link href="/policies/terms">Términos y condiciones</Link>
                 </li>
+                <li>
+                  <Link href="/policies/shippging">Políticas de envio</Link>
+                </li>
               </ul>
             </div>
           </div>

@@ -37,7 +37,7 @@ const LoginPage = () => {
   return (
     <AuthCardLayout
       title="Iniciar sesión"
-      description="Accede al panel administrativo con tus credenciales."
+      description="Accede para ver tus pedidos ofertas y más."
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

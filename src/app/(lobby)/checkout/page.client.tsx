@@ -688,7 +688,7 @@ export default function CheckoutClient({ user }: Props) {
             {/* Items */}
             <Card>
               <CardHeader>
-                <CardTitle>Tu Orden ({amount()} items)</CardTitle>
+                <CardTitle>Tu Orden ({items.length} items)</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

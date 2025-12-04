@@ -40,7 +40,7 @@ const RegisterPage = () => {
   return (
     <AuthCardLayout
       title="Crear cuenta"
-      description="Regístrate para administrar tus categorías y productos."
+      description="Regístrate para administrar pedidos y obtener grandes ofertas."
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -111,7 +111,7 @@ const RegisterPage = () => {
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="tu-correo@empresa.com"
+                    placeholder="tu-correo@mail.com"
                     autoComplete="email"
                     disabled={isPending}
                     {...field}
